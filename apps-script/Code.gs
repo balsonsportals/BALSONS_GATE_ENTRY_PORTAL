@@ -59,8 +59,8 @@ function doPost(e) {
   var requestId = request.requestId || 'req_' + startTime;
   var authToken = request.authToken || '';
 
-  // Phase 0 Auth Check
-  if (action !== 'system.ping' && authToken !== CONFIG.AUTH_HEADER_KEY) {
+  // Phase 0 Auth Check: All POST actions require valid authentication token
+  if (action !== 'system.public_ping' && authToken !== CONFIG.AUTH_HEADER_KEY) {
     return createJsonResponse({
       success: false,
       status: 401,
@@ -74,9 +74,11 @@ function doPost(e) {
   var responseData = {};
   try {
     switch (action) {
+      case 'system.public_ping':
       case 'system.ping':
         responseData = {
           message: 'Phase 0 Transport Handshake Verified.',
+          authenticated: (authToken === CONFIG.AUTH_HEADER_KEY),
           clientTimestamp: request.timestamp || null,
           transportProtocol: 'POST / text/plain (CORS preflight-safe)',
           environment: CONFIG.ENV
