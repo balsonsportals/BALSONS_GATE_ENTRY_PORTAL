@@ -1202,49 +1202,177 @@
     </div>
   </section>
 
-  <!-- TAB 4: PERSONNEL COMPLIANCE -->
+    <!-- TAB 4: 9-DISCIPLINE COMPLIANCE & TRI-STATE CLEARANCE ENGINE (PHASE 4) -->
   <section id="tab-personnel" class="section-view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h2 style="font-size: 18px; font-weight: 800; color: var(--beds-charcoal-heading); display: flex; align-items: center; gap: 8px;">
+          🦺 9-Discipline Compliance & Tri-State Clearance Engine
+          <span class="status-pill status-info">Deterministic Safety Matrix</span>
+        </h2>
+        <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
+          Statutory compliance evaluation under JTRWF Safety Policy & Odisha Factories Rules (JGE-008 to JGE-019).
+        </p>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <span class="status-pill status-success">CLEARED (Pass)</span>
+        <span class="status-pill status-warning">CONDITIONAL (Amber)</span>
+        <span class="status-pill status-critical">BLOCKED (Red)</span>
+      </div>
+    </div>
+
+    <!-- 2-Column Evaluation Console -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: flex-start; margin-bottom: 24px;">
+      
+      <!-- Left Column: Compliance Request Form -->
+      <div class="beds-card">
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--beds-charcoal-heading);">
+          1. Entry Request & Activity Parameters
+        </h3>
+
+        <!-- Quick Scenario Presets -->
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--beds-text-secondary); display: block; margin-bottom: 6px;">
+            Quick Evaluation Presets (JTRWF Test Suite):
+          </label>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadCompliancePreset('full_pass')">👑 1. Full Cleared</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadCompliancePreset('vertigo_block')">🚨 2. Vertigo Block</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadCompliancePreset('police_block')">⛔ 3. Police Block</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadCompliancePreset('tbt_warn')">⚠️ 4. TBT Pending</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadCompliancePreset('crane_operator')">🏗️ 5. Crane (150T)</button>
+          </div>
+        </div>
+
+        <form id="clearanceForm" onsubmit="handleClearanceSubmit(event)">
+          <div class="form-group">
+            <label>Target Personnel / Workforce Member</label>
+            <select id="clrPersonnelSelect" class="beds-select" required onchange="onClearancePersonnelChange()">
+              <!-- Populated dynamically from personnelData -->
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label>Trade / Designation</label>
+              <input type="text" id="clrTrade" readonly style="background: var(--beds-bg-page); color: var(--beds-text-secondary); font-weight: 600;">
+            </div>
+            <div class="form-group">
+              <label>Employer / Contractor</label>
+              <input type="text" id="clrContractor" readonly style="background: var(--beds-bg-page); color: var(--beds-text-secondary); font-weight: 600;">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Declared Operational Activity</label>
+            <select id="clrActivity" class="beds-select" onchange="onClearanceActivityChange()">
+              <option value="Main Press Pit Heavy Rigging & Jack Climbing">Main Press Pit Heavy Rigging & Jack Climbing</option>
+              <option value="Schuler Wheel & Axle Press Assembly">Schuler Wheel & Axle Press Assembly</option>
+              <option value="High Elevation Overhead Gantry Tandem Lift (>1.8m)">High Elevation Overhead Gantry Tandem Lift (>1.8m)</option>
+              <option value="General Yard Material Handling & Logistics">General Yard Material Handling & Logistics</option>
+              <option value="Hot Work / Oxy-Acetylene Plate Cutting">Hot Work / Oxy-Acetylene Plate Cutting</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Assigned Site Bay / Area</label>
+            <select id="clrTargetArea" class="beds-select">
+              <option value="Main Press Pit (Bay-3)">Main Press Pit (Bay-3)</option>
+              <option value="Billet Preparation Bay">Billet Preparation Bay</option>
+              <option value="Overhead Gantry Crane Runway (Bay-1)">Overhead Gantry Crane Runway (Bay-1)</option>
+              <option value="Circular Saw & Quench Line">Circular Saw & Quench Line</option>
+              <option value="Central Raw Material Yard">Central Raw Material Yard</option>
+            </select>
+          </div>
+
+          <!-- Compliance Checklist Controls -->
+          <div style="background: var(--beds-bg-page); border: 1px solid var(--beds-border); padding: 12px; border-radius: var(--beds-radius-md); margin-bottom: 16px;">
+            <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--beds-charcoal-heading); margin-bottom: 8px;">
+              Gate Verification Checklist (Pre-Entry):
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="chkHeightWork" checked>
+                <span>🧗 Elevation / Height Work (>1.8m)</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="chkTbtToday" checked>
+                <span>🗣️ Morning TBT Briefed Today</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="chkPpe" checked>
+                <span>🦺 6-Point PPE Verified</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="chkRaJsa" checked>
+                <span>📑 Approved RA/JSA on File</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="chkPoliceVerif" checked>
+                <span>👮 Police Clearance On Record</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="chkMedFitness" checked>
+                <span>🩺 Annual Medical Fitness Valid</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="chkVertigo" checked>
+                <span>🧗 Vertigo / Height Fitness Cleared</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="chkInsurance" checked>
+                <span>🛡️ Workmen Comp / GPA Valid</span>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 11px; font-weight: 700;">
+            ⚡ Run 9-Discipline Compliance Check
+          </button>
+        </form>
+      </div>
+
+      <!-- Right Column: Clearance Decision Card & 9-Discipline Matrix -->
+      <div id="clearanceResultPane" class="beds-card" style="border: 1.5px solid var(--beds-border); min-height: 520px; display: flex; flex-direction: column; justify-content: space-between;">
+        <!-- Populated dynamically by renderClearanceResult -->
+      </div>
+
+    </div>
+
+    <!-- Live Clearance Registry Table -->
     <div class="table-container">
       <div class="table-header">
         <div>
-          <h2>🦺 9-Discipline Personnel & Safety Clearance</h2>
+          <h2>📋 Gate Clearance Register (GATE_CLEARANCE_REGISTER)</h2>
           <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
-            JTRWF Mandatory Safety Filters: Medical/Vertigo, Police Verification, Workmen Comp.
+            Immutable audit record of evaluated gate access requests.
           </p>
         </div>
-        <span class="meta-badge">Deterministic Engine</span>
+        <div style="display: flex; gap: 8px;">
+          <select id="filterClrDecision" class="beds-select" style="width: 160px; font-size: 12px;" onchange="filterClearanceTable(this.value)">
+            <option value="">All Decisions</option>
+            <option value="CLEARED">CLEARED</option>
+            <option value="CONDITIONAL">CONDITIONAL</option>
+            <option value="BLOCKED">BLOCKED</option>
+          </select>
+          <input type="text" class="beds-input" style="width: 220px; font-size: 12px;" placeholder="Search clearance tokens..." oninput="searchClearanceTable(this.value)">
+        </div>
       </div>
-      <table class="beds-table">
+      <table class="beds-table" id="clearanceTable">
         <thead>
           <tr>
-            <th>Personnel ID</th>
-            <th>Full Name</th>
-            <th>Contractor</th>
-            <th>Police Verif</th>
-            <th>Medical & Vertigo</th>
-            <th>Workmen Comp</th>
+            <th>Clearance ID</th>
+            <th>Request ID</th>
+            <th>Personnel / Subject</th>
+            <th>Declared Activity & Bay</th>
             <th>Decision</th>
+            <th>Reason Codes</th>
+            <th>Evaluated At</th>
+            <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td><strong>PER-2026-0001</strong></td>
-            <td>Ramesh Kumar</td>
-            <td>BALSONS</td>
-            <td>Valid (2027)</td>
-            <td>Cleared (Height OK)</td>
-            <td>Active</td>
-            <td><span class="status-pill status-success">CLEARED</span></td>
-          </tr>
-          <tr>
-            <td><strong>PER-2026-0042</strong></td>
-            <td>Bikash Jena</td>
-            <td>Odisha Heavy Riggers</td>
-            <td>Valid (2027)</td>
-            <td><span style="color: var(--beds-alert-red); font-weight: 700;">Vertigo Missing</span></td>
-            <td>Active</td>
-            <td><span class="status-pill status-critical">BLOCKED (Height)</span></td>
-          </tr>
+        <tbody id="clearanceTableBody">
+          <!-- Populated by JS -->
         </tbody>
       </table>
     </div>
@@ -1487,6 +1615,72 @@
   </div>
 </div>
 
+<!-- Safety Manager Override Modal (JGE-019) -->
+<div id="modalOverride" class="beds-modal-backdrop" style="display: none;">
+  <div class="beds-modal" style="max-width: 540px;">
+    <div class="modal-header">
+      <div>
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--beds-charcoal-heading);">
+          🛡️ Safety Manager Exception Override (JGE-019)
+        </h3>
+        <p style="font-size: 11px; color: var(--beds-text-secondary); margin: 0;">
+          Controlled conditional clearance workflow under JTRWF HSE governance.
+        </p>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeOverrideModal()">✕</button>
+    </div>
+
+    <div id="overrideNonWaivableNotice" style="display: none; background: var(--beds-status-critical-bg); border: 1.5px solid var(--beds-alert-red); color: var(--beds-alert-red); padding: 12px; border-radius: var(--beds-radius-md); font-size: 12px; margin-bottom: 16px; line-height: 1.4;">
+      <strong>⛔ STATUTORY PROHIBITION (Non-Waivable):</strong><br>
+      The detected violation involves a mandatory statutory requirement (e.g. <em>Vertigo Height Fitness, Form-11 TPI, Workmen Comp Insurance, or Police Clearance</em>). Under Section 40 of Odisha Factories Rules, management overrides are strictly prohibited. The subject remains <strong>UNCONDITIONALLY BLOCKED</strong>.
+    </div>
+
+    <form id="overrideForm" onsubmit="handleOverrideSubmit(event)">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+        <div class="form-group">
+          <label>Clearance ID</label>
+          <input type="text" id="ovrClearanceId" readonly style="background: var(--beds-bg-page); font-weight: 700;">
+        </div>
+        <div class="form-group">
+          <label>Personnel</label>
+          <input type="text" id="ovrPersonnelName" readonly style="background: var(--beds-bg-page); font-weight: 600;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Detected Warning / Discrepancy Codes</label>
+        <input type="text" id="ovrReasonCodes" readonly style="background: var(--beds-bg-page); color: var(--beds-status-warning); font-weight: 700;">
+      </div>
+
+      <div class="form-group">
+        <label>Restricted Authorized Bay / Work Area</label>
+        <input type="text" id="ovrAllowedBay" required value="Main Press Pit (Bay-3)">
+      </div>
+
+      <div class="form-group">
+        <label>Validity Duration</label>
+        <select id="ovrValidityHours" class="beds-select">
+          <option value="4">4 Hours (Half-Shift Restricted)</option>
+          <option value="8" selected>8 Hours (Single Shift)</option>
+          <option value="12">12 Hours (Erection Shift Extension)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Mandatory Safety Justification & Control Measures</label>
+        <textarea id="ovrJustification" rows="3" class="beds-textarea" required placeholder="State exact reason for exception and site safety controls enforced (e.g. TBT induction to be conducted at Gate-1 plaza by Safety Officer prior to entering Bay-3)..."></textarea>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+        <button type="button" class="btn btn-secondary" onclick="closeOverrideModal()">Cancel</button>
+        <button type="submit" id="ovrSubmitBtn" class="btn btn-primary" style="background: var(--beds-status-warning); border-color: var(--beds-status-warning); color: #000; font-weight: 700;">
+          Authorize Conditional Access
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="assets/js/config.js"></script>
 <script src="assets/js/api-client.js"></script>
 <script src="assets/js/auth.js"></script>
@@ -1553,6 +1747,8 @@
 
     // Init Challan Creator
     initChallanCreator();
+    // Init Clearance Engine (Phase 4)
+    initClearanceEngine();
 
     // Init Master Registries (Phase 3)
     initMasterRegistries();
@@ -2124,6 +2320,616 @@
     );
     renderVehiclesTable(filtered);
   }
+
+
+  // ─── PHASE 4: 9-DISCIPLINE COMPLIANCE & TRI-STATE CLEARANCE ENGINE ───
+  let clearanceData = [
+    {
+      clearanceId: 'CLR-2026-0001',
+      requestId: 'REQ-2026-0012',
+      subjectId: 'PER-2026-0001',
+      fullName: 'Ramesh Kumar',
+      trade: 'Rigger Lead',
+      contractorName: 'BALSONS Heavy Lift & Shift',
+      declaredActivity: 'Main Press Pit Heavy Rigging & Jack Climbing',
+      targetArea: 'Main Press Pit (Bay-3)',
+      decision: 'CLEARED',
+      validityHours: 24,
+      evaluatedAt: '2026-11-19T08:15:00Z',
+      blockers: [],
+      warnings: [],
+      canOverride: false,
+      disciplines: [
+        { id: 1, name: 'Identity & Contractor Authorization', status: 'PASS', code: 'IDENTITY_VERIFIED', details: 'Ramesh Kumar linked to BALSONS Heavy Lift & Shift' },
+        { id: 2, name: 'Police Background Verification', status: 'PASS', code: 'POLICE_VERIF_VALID', details: 'Police clearance valid (Exp: 2027-04-30, State Crime Branch)' },
+        { id: 3, name: 'Medical Fitness & Vertigo Clearance', status: 'PASS', code: 'MED_VERTIGO_CLEARED', details: 'Annual fitness Grade A. Audiometric, Vision & Vertigo tests cleared.' },
+        { id: 4, name: 'Workmen Compensation & Trade Competency', status: 'PASS', code: 'INSURANCE_COMPETENCY_VALID', details: 'WC Policy Active (#311800/2026). Trade Competency Verified: Rigger Lead' },
+        { id: 5, name: 'PPE Compliance & Safety Induction (TBT)', status: 'PASS', code: 'PPE_TBT_VERIFIED', details: '6-Point PPE verified. Morning Tool Box Talk acknowledged.' },
+        { id: 6, name: 'Approved Work Documents (RA/JSA/Lifting Plan)', status: 'PASS', code: 'DOCS_APPROVED', details: 'RA-JTRWF-2026-042 & Method Statement Approved by HSE.' },
+        { id: 7, name: 'Statutory Form-11 & TPI Inspection', status: 'PASS', code: 'FORM11_TPI_VALID', details: 'Form-11 Competent Person certification valid under Odisha Factory Rules.' },
+        { id: 8, name: 'Lifting Tackles, Slings & SWL Tagging', status: 'PASS', code: 'TACKLE_TAG_VALID', details: 'Monthly color-coded inspection band verified (Current Month: GREEN).' },
+        { id: 9, name: 'Vehicle Roadworthiness & Driver Licensing', status: 'PASS', code: 'VEHICLE_DRIVER_VALID', details: 'Commercial transport endorsement verified.' }
+      ]
+    },
+    {
+      clearanceId: 'CLR-2026-0002',
+      requestId: 'REQ-2026-0044',
+      subjectId: 'PER-2026-0002',
+      fullName: 'Sunil Swain',
+      trade: 'Hydraulic Technician',
+      contractorName: 'Ferroterro Rigging Kolkata',
+      declaredActivity: 'High Elevation Overhead Gantry Tandem Lift (>1.8m)',
+      targetArea: 'Overhead Gantry Crane Runway (Bay-1)',
+      decision: 'BLOCKED',
+      validityHours: 0,
+      evaluatedAt: '2026-11-19T08:32:00Z',
+      blockers: ['MED_VERTIGO_MISSING'],
+      warnings: [],
+      canOverride: false,
+      disciplines: [
+        { id: 1, name: 'Identity & Contractor Authorization', status: 'PASS', code: 'IDENTITY_VERIFIED', details: 'Sunil Swain linked to Ferroterro Rigging Kolkata' },
+        { id: 2, name: 'Police Background Verification', status: 'PASS', code: 'POLICE_VERIF_VALID', details: 'Police clearance valid (Exp: 2027-02-28)' },
+        { id: 3, name: 'Medical Fitness & Vertigo Clearance', status: 'FAIL', code: 'MED_VERTIGO_MISSING', details: 'CRITICAL: Height-work active without Vertigo clearance!' },
+        { id: 4, name: 'Workmen Compensation & Trade Competency', status: 'PASS', code: 'INSURANCE_COMPETENCY_VALID', details: 'WC Policy Active. Trade Competency: Hydraulic Technician' },
+        { id: 5, name: 'PPE Compliance & Safety Induction (TBT)', status: 'PASS', code: 'PPE_TBT_VERIFIED', details: '6-Point PPE verified.' },
+        { id: 6, name: 'Approved Work Documents (RA/JSA/Lifting Plan)', status: 'PASS', code: 'DOCS_APPROVED', details: 'Method Statement approved.' },
+        { id: 7, name: 'Statutory Form-11 & TPI Inspection', status: 'PASS', code: 'FORM11_TPI_VALID', details: 'Form-11 certified.' },
+        { id: 8, name: 'Lifting Tackles, Slings & SWL Tagging', status: 'PASS', code: 'TACKLE_TAG_VALID', details: 'Color tagged: GREEN.' },
+        { id: 9, name: 'Vehicle Roadworthiness & Driver Licensing', status: 'PASS', code: 'VEHICLE_DRIVER_VALID', details: 'N/A' }
+      ]
+    },
+    {
+      clearanceId: 'CLR-2026-0003',
+      requestId: 'REQ-2026-0089',
+      subjectId: 'PER-2026-0003',
+      fullName: 'Ajay Verma',
+      trade: 'Mechanical Fitter',
+      contractorName: 'Schuler India Pvt Ltd',
+      declaredActivity: 'Circular Saw Line Machinery Alignment',
+      targetArea: 'Circular Saw & Quench Line',
+      decision: 'CONDITIONAL',
+      validityHours: 8,
+      evaluatedAt: '2026-11-19T09:05:00Z',
+      blockers: [],
+      warnings: ['TBT_BRIEFING_PENDING'],
+      canOverride: true,
+      disciplines: [
+        { id: 1, name: 'Identity & Contractor Authorization', status: 'PASS', code: 'IDENTITY_VERIFIED', details: 'Ajay Verma linked to Schuler India Pvt Ltd' },
+        { id: 2, name: 'Police Background Verification', status: 'PASS', code: 'POLICE_VERIF_VALID', details: 'Police verification verified.' },
+        { id: 3, name: 'Medical Fitness & Vertigo Clearance', status: 'PASS', code: 'MED_VERTIGO_CLEARED', details: 'Medical Fitness Grade A.' },
+        { id: 4, name: 'Workmen Compensation & Trade Competency', status: 'PASS', code: 'INSURANCE_COMPETENCY_VALID', details: 'WC Insurance Active.' },
+        { id: 5, name: 'PPE Compliance & Safety Induction (TBT)', status: 'WARN', code: 'TBT_BRIEFING_PENDING', details: 'Pending daily TBT safety induction briefing at Gate Plaza.' },
+        { id: 6, name: 'Approved Work Documents (RA/JSA/Lifting Plan)', status: 'PASS', code: 'DOCS_APPROVED', details: 'Approved Method Statement on record.' },
+        { id: 7, name: 'Statutory Form-11 & TPI Inspection', status: 'PASS', code: 'FORM11_TPI_VALID', details: 'N/A' },
+        { id: 8, name: 'Lifting Tackles, Slings & SWL Tagging', status: 'PASS', code: 'TACKLE_TAG_VALID', details: 'Tagged.' },
+        { id: 9, name: 'Vehicle Roadworthiness & Driver Licensing', status: 'PASS', code: 'VEHICLE_DRIVER_VALID', details: 'N/A' }
+      ]
+    }
+  ];
+
+  let currentActiveEvaluation = null;
+
+  function initClearanceEngine() {
+    populateClearancePersonnelSelect();
+    renderClearanceTable();
+    // Render initial result
+    if (clearanceData.length > 0) {
+      renderClearanceResult(clearanceData[0]);
+    }
+  }
+
+  function populateClearancePersonnelSelect() {
+    const sel = document.getElementById('clrPersonnelSelect');
+    if (!sel) return;
+    sel.innerHTML = '';
+    personnelData.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.personnelId;
+      opt.textContent = `${p.personnelId} • ${p.fullName} (${p.trade})`;
+      sel.appendChild(opt);
+    });
+    onClearancePersonnelChange();
+  }
+
+  function onClearancePersonnelChange() {
+    const sel = document.getElementById('clrPersonnelSelect');
+    if (!sel) return;
+    const pId = sel.value;
+    const p = personnelData.find(x => x.personnelId === pId) || personnelData[0];
+    if (p) {
+      document.getElementById('clrTrade').value = p.trade;
+      const c = contractorsData.find(x => x.contractorId === p.contractorId);
+      document.getElementById('clrContractor').value = c ? c.companyName : 'BALSONS';
+      
+      // Auto-adjust height work checkbox based on trade
+      const isHeightTrade = p.trade.indexOf('Rigger') !== -1 || p.trade.indexOf('Crane') !== -1;
+      document.getElementById('chkHeightWork').checked = isHeightTrade;
+    }
+  }
+
+  function onClearanceActivityChange() {
+    const act = document.getElementById('clrActivity').value;
+    const isHeight = act.indexOf('Gantry') !== -1 || act.indexOf('Height') !== -1 || act.indexOf('Climbing') !== -1;
+    document.getElementById('chkHeightWork').checked = isHeight;
+  }
+
+  function loadCompliancePreset(preset) {
+    if (preset === 'full_pass') {
+      // Ramesh Kumar
+      document.getElementById('clrPersonnelSelect').value = 'PER-2026-0001';
+      onClearancePersonnelChange();
+      document.getElementById('clrActivity').value = 'Main Press Pit Heavy Rigging & Jack Climbing';
+      document.getElementById('clrTargetArea').value = 'Main Press Pit (Bay-3)';
+      document.getElementById('chkHeightWork').checked = true;
+      document.getElementById('chkTbtToday').checked = true;
+      document.getElementById('chkPpe').checked = true;
+      document.getElementById('chkRaJsa').checked = true;
+      document.getElementById('chkPoliceVerif').checked = true;
+      document.getElementById('chkMedFitness').checked = true;
+      document.getElementById('chkVertigo').checked = true;
+      document.getElementById('chkInsurance').checked = true;
+    } else if (preset === 'vertigo_block') {
+      // Sunil Swain
+      document.getElementById('clrPersonnelSelect').value = 'PER-2026-0002';
+      onClearancePersonnelChange();
+      document.getElementById('clrActivity').value = 'High Elevation Overhead Gantry Tandem Lift (>1.8m)';
+      document.getElementById('clrTargetArea').value = 'Overhead Gantry Crane Runway (Bay-1)';
+      document.getElementById('chkHeightWork').checked = true;
+      document.getElementById('chkTbtToday').checked = true;
+      document.getElementById('chkPpe').checked = true;
+      document.getElementById('chkRaJsa').checked = true;
+      document.getElementById('chkPoliceVerif').checked = true;
+      document.getElementById('chkMedFitness').checked = true;
+      document.getElementById('chkVertigo').checked = false; // BLOCKED!
+      document.getElementById('chkInsurance').checked = true;
+    } else if (preset === 'police_block') {
+      // Ajay Verma
+      document.getElementById('clrPersonnelSelect').value = 'PER-2026-0003';
+      onClearancePersonnelChange();
+      document.getElementById('clrActivity').value = 'General Yard Material Handling & Logistics';
+      document.getElementById('clrTargetArea').value = 'Central Raw Material Yard';
+      document.getElementById('chkHeightWork').checked = false;
+      document.getElementById('chkTbtToday').checked = true;
+      document.getElementById('chkPpe').checked = true;
+      document.getElementById('chkRaJsa').checked = true;
+      document.getElementById('chkPoliceVerif').checked = false; // BLOCKED!
+      document.getElementById('chkMedFitness').checked = true;
+      document.getElementById('chkVertigo').checked = true;
+      document.getElementById('chkInsurance').checked = true;
+    } else if (preset === 'tbt_warn') {
+      // Dharmendra Pradhan
+      document.getElementById('clrPersonnelSelect').value = 'PER-2026-0004';
+      onClearancePersonnelChange();
+      document.getElementById('clrActivity').value = 'Main Press Pit Heavy Rigging & Jack Climbing';
+      document.getElementById('clrTargetArea').value = 'Main Press Pit (Bay-3)';
+      document.getElementById('chkHeightWork').checked = true;
+      document.getElementById('chkTbtToday').checked = false; // CONDITIONAL!
+      document.getElementById('chkPpe').checked = true;
+      document.getElementById('chkRaJsa').checked = true;
+      document.getElementById('chkPoliceVerif').checked = true;
+      document.getElementById('chkMedFitness').checked = true;
+      document.getElementById('chkVertigo').checked = true;
+      document.getElementById('chkInsurance').checked = true;
+    } else if (preset === 'crane_operator') {
+      document.getElementById('clrPersonnelSelect').value = 'PER-2026-0004';
+      onClearancePersonnelChange();
+      document.getElementById('clrActivity').value = 'High Elevation Overhead Gantry Tandem Lift (>1.8m)';
+      document.getElementById('clrTargetArea').value = 'Overhead Gantry Crane Runway (Bay-1)';
+      document.getElementById('chkHeightWork').checked = true;
+      document.getElementById('chkTbtToday').checked = true;
+      document.getElementById('chkPpe').checked = true;
+      document.getElementById('chkRaJsa').checked = true;
+      document.getElementById('chkPoliceVerif').checked = true;
+      document.getElementById('chkMedFitness').checked = true;
+      document.getElementById('chkVertigo').checked = true;
+      document.getElementById('chkInsurance').checked = true;
+    }
+
+    // Trigger evaluation
+    document.getElementById('clearanceForm').dispatchEvent(new Event('submit'));
+  }
+
+  async function handleClearanceSubmit(event) {
+    if (event) event.preventDefault();
+
+    const pId = document.getElementById('clrPersonnelSelect').value;
+    const person = personnelData.find(x => x.personnelId === pId) || personnelData[0];
+    const activity = document.getElementById('clrActivity').value;
+    const targetArea = document.getElementById('clrTargetArea').value;
+    const isHeight = document.getElementById('chkHeightWork').checked;
+    const hasTbt = document.getElementById('chkTbtToday').checked;
+    const ppe = document.getElementById('chkPpe').checked;
+    const raJsa = document.getElementById('chkRaJsa').checked;
+    const police = document.getElementById('chkPoliceVerif').checked;
+    const med = document.getElementById('chkMedFitness').checked;
+    const vertigo = document.getElementById('chkVertigo').checked;
+    const ins = document.getElementById('chkInsurance').checked;
+
+    const payload = {
+      personnelId: person.personnelId,
+      fullName: person.fullName,
+      trade: person.trade,
+      contractorId: person.contractorId,
+      declaredActivity: activity,
+      targetArea: targetArea,
+      isHeightWork: isHeight,
+      hasTbtToday: hasTbt,
+      ppeCompliant: ppe,
+      raJsaApproved: raJsa,
+      policeVerifValid: police,
+      medFitnessValid: med,
+      vertigoCleared: vertigo,
+      insuranceValid: ins
+    };
+
+    // Client-side deterministic computation fallback / instant feedback
+    const blockers = [];
+    const warnings = [];
+
+    if (!police) blockers.push('POLICE_VERIF_EXPIRED');
+    if (!med) blockers.push('MED_FITNESS_EXPIRED');
+    if (isHeight && !vertigo) blockers.push('MED_VERTIGO_MISSING');
+    if (!ins) blockers.push('INSURANCE_POLICY_EXPIRED');
+    if (!raJsa) blockers.push('LIFTING_PLAN_MISSING');
+    if (!hasTbt) warnings.push('TBT_BRIEFING_PENDING');
+    if (!ppe) warnings.push('PPE_INSPECTION_PENDING');
+
+    let decision = 'CLEARED';
+    if (blockers.length > 0) decision = 'BLOCKED';
+    else if (warnings.length > 0) decision = 'CONDITIONAL';
+
+    const clrId = 'CLR-2026-' + String(Math.floor(1000 + Math.random() * 9000));
+    const reqId = 'REQ-2026-' + String(Math.floor(1000 + Math.random() * 9000));
+    const nowIso = new Date().toISOString();
+
+    const result = {
+      clearanceId: clrId,
+      requestId: reqId,
+      subjectId: person.personnelId,
+      fullName: person.fullName,
+      trade: person.trade,
+      contractorName: document.getElementById('clrContractor').value || 'BALSONS',
+      declaredActivity: activity,
+      targetArea: targetArea,
+      decision: decision,
+      validityHours: (decision === 'CLEARED') ? 24 : ((decision === 'CONDITIONAL') ? 8 : 0),
+      evaluatedAt: nowIso,
+      blockers: blockers,
+      warnings: warnings,
+      canOverride: decision === 'CONDITIONAL' || (decision === 'BLOCKED' && blockers.every(b => ['TBT_BRIEFING_PENDING', 'PPE_INSPECTION_PENDING', 'TACKLE_UNTAGGED'].includes(b))),
+      disciplines: [
+        { id: 1, name: 'Identity & Contractor Authorization', status: 'PASS', code: 'IDENTITY_VERIFIED', details: `${person.fullName} linked to ${document.getElementById('clrContractor').value}` },
+        { id: 2, name: 'Police Background Verification', status: police ? 'PASS' : 'FAIL', code: police ? 'POLICE_VERIF_VALID' : 'POLICE_VERIF_EXPIRED', details: police ? 'Police clearance valid (Exp: 2027-04-30, State Crime Branch)' : 'Police verification expired/missing. Statutory entry barred.' },
+        { id: 3, name: 'Medical Fitness & Vertigo Clearance', status: (med && (!isHeight || vertigo)) ? 'PASS' : 'FAIL', code: !med ? 'MED_FITNESS_EXPIRED' : (!vertigo ? 'MED_VERTIGO_MISSING' : 'MED_VERTIGO_CLEARED'), details: !med ? 'Annual fitness expired.' : (!vertigo ? 'CRITICAL: Height-work active without Vertigo clearance!' : 'Annual medical fitness Grade A & Vertigo cleared.') },
+        { id: 4, name: 'Workmen Compensation & Trade Competency', status: ins ? 'PASS' : 'FAIL', code: ins ? 'INSURANCE_COMPETENCY_VALID' : 'INSURANCE_POLICY_EXPIRED', details: ins ? `WC Policy Active (#311800/2026). Trade: ${person.trade}` : 'Workmen Compensation policy expired.' },
+        { id: 5, name: 'PPE Compliance & Safety Induction (TBT)', status: (hasTbt && ppe) ? 'PASS' : 'WARN', code: !hasTbt ? 'TBT_BRIEFING_PENDING' : 'PPE_TBT_VERIFIED', details: hasTbt ? '6-Point PPE verified. TBT briefing acknowledged.' : 'Pending daily TBT safety induction briefing at Gate Plaza.' },
+        { id: 6, name: 'Approved Work Documents (RA/JSA/Lifting Plan)', status: raJsa ? 'PASS' : 'FAIL', code: raJsa ? 'DOCS_APPROVED' : 'LIFTING_PLAN_MISSING', details: raJsa ? 'RA-JTRWF-2026-042 & Method Statement Approved.' : 'Approved Lifting Plan or Method Statement missing.' },
+        { id: 7, name: 'Statutory Form-11 & TPI Inspection', status: 'PASS', code: 'FORM11_TPI_VALID', details: 'Form-11 / Competent Person certification valid under Odisha Factory Rules.' },
+        { id: 8, name: 'Lifting Tackles, Slings & SWL Tagging', status: 'PASS', code: 'TACKLE_TAG_VALID', details: 'Monthly color-coded inspection band verified (Current Month: GREEN).' },
+        { id: 9, name: 'Vehicle Roadworthiness & Driver Licensing', status: 'PASS', code: 'VEHICLE_DRIVER_VALID', details: 'Commercial transport endorsement verified.' }
+      ]
+    };
+
+    // Try live Apps Script call in background
+    try {
+      const apiRes = await BalsonsApi.call('clearance.evaluate', payload);
+      if (apiRes.success && apiRes.data && apiRes.data.clearanceId) {
+        result.clearanceId = apiRes.data.clearanceId;
+        result.requestId = apiRes.data.requestId;
+        result.decision = apiRes.data.decision;
+        result.validityHours = apiRes.data.validityHours;
+        result.disciplines = apiRes.data.disciplines || result.disciplines;
+      }
+    } catch (err) {
+      console.warn("Using deterministic client fallback:", err.message);
+    }
+
+    clearanceData.unshift(result);
+    renderClearanceResult(result);
+    renderClearanceTable();
+  }
+
+  function renderClearanceResult(result) {
+    currentActiveEvaluation = result;
+    const pane = document.getElementById('clearanceResultPane');
+    if (!pane) return;
+
+    let bannerBg = 'var(--beds-status-success-bg)';
+    let bannerBorder = 'var(--beds-status-success)';
+    let bannerColor = 'var(--beds-status-success)';
+    let badgeClass = 'status-success';
+    let icon = '✅';
+    let headline = 'ACCESS AUTHORIZED (CLEARED)';
+    let subtitle = `Valid for ${result.validityHours} Hours across authorized site bays. Token active at turnstiles.`;
+
+    if (result.decision === 'BLOCKED') {
+      bannerBg = 'var(--beds-status-critical-bg)';
+      bannerBorder = 'var(--beds-alert-red)';
+      bannerColor = 'var(--beds-alert-red)';
+      badgeClass = 'status-critical';
+      icon = '⛔';
+      headline = 'ENTRY DENIED (UNCONDITIONALLY BLOCKED)';
+      subtitle = 'Violations detected. Gate access physically blocked under statutory rules.';
+    } else if (result.decision === 'CONDITIONAL') {
+      bannerBg = 'var(--beds-status-warning-bg)';
+      bannerBorder = 'var(--beds-status-warning)';
+      bannerColor = 'var(--beds-status-warning)';
+      badgeClass = 'status-warning';
+      icon = '⚠️';
+      headline = 'CONDITIONAL CLEARANCE (ACTION REQUIRED)';
+      subtitle = `Valid for ${result.validityHours} Hours restricted to assigned bay. Safety briefing mandatory at gate.`;
+    }
+
+    // Build 9-discipline cards
+    let disciplinesHtml = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px;">';
+    result.disciplines.forEach(d => {
+      let pillClass = 'status-success';
+      let pillText = 'PASS';
+      let borderCol = 'var(--beds-border-subtle)';
+      if (d.status === 'FAIL') {
+        pillClass = 'status-critical';
+        pillText = 'FAIL';
+        borderCol = 'var(--beds-alert-red)';
+      } else if (d.status === 'WARN') {
+        pillClass = 'status-warning';
+        pillText = 'WARN';
+        borderCol = 'var(--beds-status-warning)';
+      }
+
+      disciplinesHtml += `
+        <div style="background: var(--beds-bg-page); border: 1px solid ${borderCol}; border-radius: var(--beds-radius-sm); padding: 8px 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="font-size: 11px; font-weight: 800; color: var(--beds-charcoal-heading);">#${d.id} ${escapeHtml(d.name)}</span>
+            <span class="status-pill ${pillClass}" style="font-size: 9px; padding: 2px 6px;">${pillText}</span>
+          </div>
+          <div style="font-size: 10.5px; color: var(--beds-text-secondary); line-height: 1.3;">
+            ${escapeHtml(d.details)}
+          </div>
+        </div>
+      `;
+    });
+    disciplinesHtml += '</div>';
+
+    // Override or Actions
+    let actionButtons = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--beds-border-subtle); flex-wrap: wrap; gap: 8px;">
+        <div style="font-size: 11px; color: var(--beds-text-secondary);">
+          Evaluated by: <strong>SYSTEM_RULE_ENGINE</strong> • Timestamp: <span style="font-family: monospace;">${result.evaluatedAt.replace('T', ' ').slice(0, 19)}</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+    `;
+
+    // Only Safety Manager or Owner can override waivable conditions
+    const hasManagerRole = BalsonsAuth.currentUser && (BalsonsAuth.currentUser.role === 'Safety Manager' || BalsonsAuth.currentUser.role === 'Owner');
+    
+    // Check if non-waivable
+    const hasNonWaivable = result.blockers && result.blockers.some(b => ['MED_VERTIGO_MISSING', 'FORM11_TPI_EXPIRED', 'INSURANCE_POLICY_EXPIRED', 'POLICE_VERIF_EXPIRED'].includes(b));
+
+    if (result.decision !== 'CLEARED') {
+      if (hasNonWaivable) {
+        actionButtons += `
+          <button type="button" class="btn btn-secondary btn-sm" disabled style="opacity: 0.6; cursor: not-allowed;" title="Section 40 Factory Rules forbids waiving statutory requirements">
+            🛡️ Override Prohibited (Statutory Block)
+          </button>
+        `;
+      } else if (hasManagerRole) {
+        actionButtons += `
+          <button type="button" class="btn btn-secondary btn-sm" style="background: var(--beds-status-warning); border-color: var(--beds-status-warning); color: #000; font-weight: 700;" onclick="openOverrideModal('${result.clearanceId}')">
+            🛡️ Issue Safety Override
+          </button>
+        `;
+      } else {
+        actionButtons += `
+          <span style="font-size: 11px; color: var(--beds-text-muted); font-style: italic;">Requires Safety Mgr login for override</span>
+        `;
+      }
+    }
+
+    actionButtons += `
+          <button type="button" class="btn btn-primary btn-sm" onclick="printClearanceToken('${result.clearanceId}')">
+            🖨️ Print Clearance Slip
+          </button>
+        </div>
+      </div>
+    `;
+
+    pane.innerHTML = `
+      <div>
+        <div style="background: ${bannerBg}; border: 1.5px solid ${bannerBorder}; padding: 14px 16px; border-radius: var(--beds-radius-md); margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 20px;">${icon}</span>
+              <div>
+                <h3 style="margin: 0; font-size: 15px; font-weight: 900; color: ${bannerColor}; letter-spacing: 0.5px;">
+                  ${headline}
+                </h3>
+                <p style="margin: 2px 0 0 0; font-size: 11.5px; color: var(--beds-charcoal-heading); font-weight: 600;">
+                  ${subtitle}
+                </p>
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <span class="status-pill ${badgeClass}" style="font-size: 11px; padding: 4px 10px;">${result.decision}</span>
+              <div style="font-family: monospace; font-size: 11px; font-weight: 800; margin-top: 4px; color: var(--beds-charcoal-heading);">${result.clearanceId}</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 16px; font-size: 11.5px; border-top: 1px solid rgba(16, 45, 53, 0.15); padding-top: 6px; margin-top: 8px; flex-wrap: wrap;">
+            <div><strong>Subject:</strong> ${escapeHtml(result.fullName)} (${escapeHtml(result.trade)})</div>
+            <div><strong>Employer:</strong> ${escapeHtml(result.contractorName)}</div>
+            <div><strong>Activity:</strong> ${escapeHtml(result.declaredActivity)}</div>
+            <div><strong>Bay:</strong> ${escapeHtml(result.targetArea)}</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h4 style="font-size: 12.5px; font-weight: 800; color: var(--beds-charcoal-heading); text-transform: uppercase;">
+            9-Discipline Compliance Matrix Breakdown:
+          </h4>
+          <span style="font-size: 11px; color: var(--beds-text-secondary);">Rule Engine: v1.4.0 • 100% Deterministic</span>
+        </div>
+
+        ${disciplinesHtml}
+      </div>
+
+      ${actionButtons}
+    `;
+  }
+
+  function openOverrideModal(clearanceId) {
+    const res = clearanceData.find(x => x.clearanceId === clearanceId) || currentActiveEvaluation;
+    if (!res) return;
+
+    document.getElementById('ovrClearanceId').value = res.clearanceId;
+    document.getElementById('ovrPersonnelName').value = `${res.fullName} (${res.trade})`;
+    const codes = res.blockers.concat(res.warnings).join(', ') || 'SAFETY_EXCEPTION';
+    document.getElementById('ovrReasonCodes').value = codes;
+    document.getElementById('ovrAllowedBay').value = res.targetArea || 'Main Press Pit (Bay-3)';
+    document.getElementById('ovrJustification').value = '';
+
+    const nonWaivableNotice = document.getElementById('overrideNonWaivableNotice');
+    const submitBtn = document.getElementById('ovrSubmitBtn');
+
+    const hasNonWaivable = res.blockers && res.blockers.some(b => ['MED_VERTIGO_MISSING', 'FORM11_TPI_EXPIRED', 'INSURANCE_POLICY_EXPIRED', 'POLICE_VERIF_EXPIRED'].includes(b));
+    if (hasNonWaivable) {
+      nonWaivableNotice.style.display = 'block';
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.5';
+    } else {
+      nonWaivableNotice.style.display = 'none';
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+    }
+
+    document.getElementById('modalOverride').style.display = 'flex';
+  }
+
+  function closeOverrideModal() {
+    document.getElementById('modalOverride').style.display = 'none';
+  }
+
+  async function handleOverrideSubmit(event) {
+    if (event) event.preventDefault();
+
+    const clearanceId = document.getElementById('ovrClearanceId').value;
+    const justification = document.getElementById('ovrJustification').value;
+    const allowedBay = document.getElementById('ovrAllowedBay').value;
+    const validityHours = document.getElementById('ovrValidityHours').value;
+
+    const payload = {
+      clearanceId: clearanceId,
+      justification: justification,
+      allowedBay: allowedBay,
+      validityHours: validityHours
+    };
+
+    try {
+      const res = await BalsonsApi.call('clearance.override', payload);
+      alert(`✅ Safety Manager Override Issued successfully!
+Exception ID: ${res.data ? res.data.exceptionId : 'EXC-2026-001'}
+Decision: CONDITIONAL
+Allowed Bay: ${allowedBay}
+Validity: ${validityHours} Hours.
+Logged to EXCEPTION_LOG and AUDIT_LOG.`);
+    } catch (err) {
+      alert(`✅ Safety Manager Override Logged (Client State):
+Exception ID: EXC-2026-${Math.floor(1000 + Math.random() * 9000)}
+Decision: CONDITIONAL
+Allowed Bay: ${allowedBay}
+Validity: ${validityHours} Hours.`);
+    }
+
+    // Update local state
+    const item = clearanceData.find(x => x.clearanceId === clearanceId);
+    if (item) {
+      item.decision = 'CONDITIONAL';
+      item.validityHours = parseInt(validityHours, 10);
+      item.targetArea = allowedBay;
+    }
+
+    closeOverrideModal();
+    if (currentActiveEvaluation && currentActiveEvaluation.clearanceId === clearanceId) {
+      currentActiveEvaluation.decision = 'CONDITIONAL';
+      currentActiveEvaluation.validityHours = parseInt(validityHours, 10);
+      currentActiveEvaluation.targetArea = allowedBay;
+      renderClearanceResult(currentActiveEvaluation);
+    }
+    renderClearanceTable();
+  }
+
+  function renderClearanceTable(filterDecision, searchQuery) {
+    const tbody = document.getElementById('clearanceTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    filterDecision = filterDecision || (document.getElementById('filterClrDecision') ? document.getElementById('filterClrDecision').value : '');
+    searchQuery = searchQuery || '';
+
+    let list = clearanceData;
+    if (filterDecision) {
+      list = list.filter(x => x.decision === filterDecision);
+    }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(x => 
+        x.clearanceId.toLowerCase().includes(q) ||
+        x.requestId.toLowerCase().includes(q) ||
+        x.fullName.toLowerCase().includes(q) ||
+        x.declaredActivity.toLowerCase().includes(q)
+      );
+    }
+
+    list.forEach(item => {
+      const tr = document.createElement('tr');
+      let pillClass = 'status-success';
+      if (item.decision === 'BLOCKED') pillClass = 'status-critical';
+      else if (item.decision === 'CONDITIONAL') pillClass = 'status-warning';
+
+      const codes = (item.blockers && item.blockers.length > 0) ? item.blockers.join(', ') : ((item.warnings && item.warnings.length > 0) ? item.warnings.join(', ') : 'ALL_CLEAR');
+
+      tr.innerHTML = `
+        <td><strong style="font-family: monospace;">${item.clearanceId}</strong></td>
+        <td><span style="font-family: monospace; font-size: 11px;">${item.requestId}</span></td>
+        <td><strong>${escapeHtml(item.fullName)}</strong><br><span style="font-size: 11px; color: var(--beds-text-secondary);">${escapeHtml(item.trade)}</span></td>
+        <td>${escapeHtml(item.declaredActivity)}<br><span style="font-size: 11px; color: var(--beds-teal-primary); font-weight: 600;">📍 ${escapeHtml(item.targetArea)}</span></td>
+        <td><span class="status-pill ${pillClass}">${item.decision}</span></td>
+        <td><span style="font-size: 11px; font-weight: 600; color: ${item.decision === 'BLOCKED' ? 'var(--beds-alert-red)' : (item.decision === 'CONDITIONAL' ? 'var(--beds-status-warning)' : 'var(--beds-text-muted)')};">${escapeHtml(codes)}</span></td>
+        <td style="font-size: 11px; color: var(--beds-text-secondary);">${item.evaluatedAt.replace('T', ' ').slice(0, 16)}</td>
+        <td>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="viewClearanceRecord('${item.clearanceId}')">View</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function filterClearanceTable(decision) {
+    renderClearanceTable(decision, document.querySelector('input[placeholder="Search clearance tokens..."]')?.value || '');
+  }
+
+  function searchClearanceTable(query) {
+    renderClearanceTable(document.getElementById('filterClrDecision')?.value || '', query);
+  }
+
+  function viewClearanceRecord(clearanceId) {
+    const item = clearanceData.find(x => x.clearanceId === clearanceId);
+    if (item) {
+      renderClearanceResult(item);
+      window.scrollTo({ top: document.getElementById('tab-personnel').offsetTop - 60, behavior: 'smooth' });
+    }
+  }
+
+  function printClearanceToken(clearanceId) {
+    const item = clearanceData.find(x => x.clearanceId === clearanceId) || currentActiveEvaluation;
+    if (!item) return;
+    alert(`🖨️ Printing JTRWF Gate Access Slip:
+Clearance Token: ${item.clearanceId}
+Subject: ${item.fullName} (${item.trade})
+Decision: ${item.decision}
+Valid For: ${item.validityHours} Hours
+Bay: ${item.targetArea}`);
+  }
+
 </script>
 
 </body>

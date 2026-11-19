@@ -7,7 +7,7 @@
 const CONFIG = {
   PROJECT_ID: 'PRJ-JTRWF-SCHULER',
   SYSTEM_NAME: 'BALSONS JTRWF Gate Entry & Site Access Portal',
-  VERSION: '1.3.0-masterdata',
+  VERSION: '1.4.0-clearance',
   ENV: 'staging',
   AUTH_HEADER_KEY: 'BALSONS_JTRWF_GATE_PHASE0_DEV_KEY',
   DEFAULT_SPREADSHEET_ID: '1yAuZOXc8WoC2TvTvnEWMrOyLl_50BRuJgDed_pdFT3o',
@@ -164,6 +164,17 @@ function doPost(e) {
         break;
       case 'vehicle.add':
         responseData = MasterDataService.addVehicle(payload, session);
+        break;
+
+      // ─── 9-DISCIPLINE CLEARANCE ENGINE (PHASE 4) ──────────────────────
+      case 'clearance.evaluate':
+        responseData = ClearanceEngine.evaluatePersonnel(payload, session);
+        break;
+      case 'clearance.override':
+        responseData = ClearanceEngine.applyOverride(payload, session);
+        break;
+      case 'clearance.list':
+        responseData = ClearanceEngine.listRecentClearances(payload.limit);
         break;
 
       default:
