@@ -1549,38 +1549,65 @@
     </div>
   </section>
 
-  <!-- TAB 5: AUDIT TRAIL -->
+    <!-- TAB 5: AUDIT TRAIL - PHASE 6 (IMMUTABLE SYSTEM LEDGER) -->
   <section id="tab-audit" class="section-view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h2 style="font-size: 18px; font-weight: 800; color: var(--beds-charcoal-heading); display: flex; align-items: center; gap: 8px;">
+          📋 Immutable System Audit Ledger (AUDIT_LOG)
+          <span class="status-pill status-info">Tamper-Evident</span>
+        </h2>
+        <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
+          Chronological cryptographic audit records synced to Google Sheets tab AUDIT_LOG.
+        </p>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn btn-secondary btn-sm" onclick="exportAuditLogCsv()">
+          📥 Export Audit CSV
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="fetchLiveAuditLogs()">
+          🔄 Refresh Audit Feed
+        </button>
+      </div>
+    </div>
+
     <div class="table-container">
       <div class="table-header">
-        <div>
-          <h2>📋 Immutable System Audit Ledger (AUDIT_LOG)</h2>
-          <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
-            Full audit history synced directly to Google Sheets tab.
-          </p>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <select id="filterAuditAction" class="beds-select" style="width: 200px; font-size: 12px;" onchange="filterAuditTable()">
+            <option value="">All Actions</option>
+            <option value="AUTH_LOGIN">Authentication</option>
+            <option value="CLEARANCE">Safety Clearance</option>
+            <option value="OVERRIDE">Safety Override</option>
+            <option value="GATE_PASS">Gate Passes</option>
+            <option value="INWARD">Material Inward</option>
+          </select>
+          <select id="filterAuditOutcome" class="beds-select" style="width: 140px; font-size: 12px;" onchange="filterAuditTable()">
+            <option value="">All Outcomes</option>
+            <option value="SUCCESS">SUCCESS</option>
+            <option value="WARN">WARN</option>
+            <option value="CRITICAL">CRITICAL / BLOCK</option>
+          </select>
         </div>
-        <span class="meta-badge">Tamper-Evident</span>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="searchAuditInput" class="beds-input" style="width: 240px; font-size: 12px;" placeholder="Search audit tokens / actors..." oninput="filterAuditTable()">
+        </div>
       </div>
-      <table class="beds-table">
+      <table class="beds-table" id="auditTable">
         <thead>
           <tr>
             <th>Audit ID</th>
             <th>Timestamp</th>
             <th>Actor</th>
             <th>Role</th>
-            <th>Action</th>
+            <th>Action Code</th>
+            <th>Entity Ref</th>
             <th>Outcome</th>
+            <th>Audit Details</th>
           </tr>
         </thead>
         <tbody id="auditTableBody">
-          <tr>
-            <td>AUD-2026-E8A1</td>
-            <td class="tabular-nums">2026-11-19 11:45:20</td>
-            <td>admin</td>
-            <td>Owner</td>
-            <td>AUTH_LOGIN_SUCCESS</td>
-            <td><span class="status-pill status-success">SUCCESS</span></td>
-          </tr>
+          <!-- Populated by JS -->
         </tbody>
       </table>
     </div>
@@ -2082,6 +2109,8 @@
     initClearanceEngine();
     // Init Physical Gate Transactions & Pass Center (Phase 5)
     initGateTransactions();
+    // Init Audit Trail (Phase 6)
+    initAuditTrail();
 
     // Init Master Registries (Phase 3)
     initMasterRegistries();
@@ -3917,6 +3946,164 @@ Approval: ${item.approvedBy}`);
         radarOverdueEl.style.color = 'var(--beds-alert-red)';
       }
     }
+  }
+
+
+
+  // ─── PHASE 6: AUDIT TRAIL & SYSTEM LEDGER ───
+  let auditLogsData = [
+    {
+      auditId: 'AUD-2026-F981',
+      timestamp: '2026-11-19 14:15:20',
+      actor: 'admin',
+      role: 'Owner',
+      action: 'ISSUE_GATE_PASS_RGP',
+      entityId: 'RGP-2026-0004',
+      outcome: 'SUCCESS',
+      details: 'Issued RGP for 100T Hydraulic Jack to Precision Calibrators Kolkata'
+    },
+    {
+      auditId: 'AUD-2026-E420',
+      timestamp: '2026-11-19 13:40:12',
+      actor: 'safety.manager',
+      role: 'Safety Manager',
+      action: 'SAFETY_OVERRIDE_EXCEPTION',
+      entityId: 'EXC-2026-0001',
+      outcome: 'WARN',
+      details: 'Authorized 8h conditional clearance for Ajay Verma (TBT induction at Gate-1)'
+    },
+    {
+      auditId: 'AUD-2026-D318',
+      timestamp: '2026-11-19 12:10:05',
+      actor: 'system.engine',
+      role: 'System',
+      action: 'CLEARANCE_EVALUATION',
+      entityId: 'CLR-2026-0002',
+      outcome: 'CRITICAL',
+      details: 'BLOCKED Sunil Swain: MED_VERTIGO_MISSING under JTRWF Height Work Policy'
+    },
+    {
+      auditId: 'AUD-2026-C209',
+      timestamp: '2026-11-19 10:15:30',
+      actor: 'gate1.sentry',
+      role: 'Security',
+      action: 'CREATE_INWARD_DELIVERY',
+      entityId: 'IGE-2026-0013',
+      outcome: 'SUCCESS',
+      details: 'Inward recorded for PO-JTRWF-2026-055 (Gantry Rails) vehicle WB-19-B-7744'
+    },
+    {
+      auditId: 'AUD-2026-B101',
+      timestamp: '2026-11-19 08:30:11',
+      actor: 'gate1.sentry',
+      role: 'Security',
+      action: 'RECORD_GATE_ENTRY',
+      entityId: 'PER-2026-0001',
+      outcome: 'SUCCESS',
+      details: 'Physical admittance of Ramesh Kumar (Rigger Lead) into Bay-3'
+    },
+    {
+      auditId: 'AUD-2026-A001',
+      timestamp: '2026-11-19 08:00:00',
+      actor: 'admin',
+      role: 'Owner',
+      action: 'AUTH_LOGIN_SUCCESS',
+      entityId: 'SESSION-ADMIN',
+      outcome: 'SUCCESS',
+      details: 'Enterprise session established from IP 10.14.2.11 (JTRWF Admin Block)'
+    }
+  ];
+
+  function initAuditTrail() {
+    renderAuditTable();
+  }
+
+  async function fetchLiveAuditLogs() {
+    try {
+      const res = await BalsonsApi.call('audit.list', { limit: 50 });
+      if (res.success && res.data && res.data.length > 0) {
+        auditLogsData = res.data;
+        renderAuditTable();
+        alert(`✅ Refreshed ${res.data.length} immutable audit records from Google Sheets!`);
+      } else {
+        alert('Audit records up to date.');
+      }
+    } catch (err) {
+      console.warn('Audit fetch local fallback:', err.message);
+      renderAuditTable();
+    }
+  }
+
+  function renderAuditTable(filteredList) {
+    const tbody = document.getElementById('auditTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const list = filteredList || auditLogsData;
+
+    list.forEach(item => {
+      const tr = document.createElement('tr');
+      let pillClass = 'status-success';
+      if (item.outcome === 'CRITICAL' || item.outcome === 'FAIL') pillClass = 'status-critical';
+      else if (item.outcome === 'WARN') pillClass = 'status-warning';
+
+      tr.innerHTML = `
+        <td><strong style="font-family: monospace;">${item.auditId}</strong></td>
+        <td style="font-size: 11px; color: var(--beds-text-secondary); white-space: nowrap;">${item.timestamp}</td>
+        <td><strong>${escapeHtml(item.actor)}</strong></td>
+        <td><span class="role-badge role-${(item.role || '').replace(/\s+/g, '')}" style="font-size: 9.5px; padding: 2px 6px;">${escapeHtml(item.role)}</span></td>
+        <td><span style="font-family: monospace; font-size: 11px; font-weight: 700; color: var(--beds-charcoal-heading);">${escapeHtml(item.action)}</span></td>
+        <td><span style="font-family: monospace; font-size: 11px; color: var(--beds-teal-primary); font-weight: 600;">${escapeHtml(item.entityId)}</span></td>
+        <td><span class="status-pill ${pillClass}" style="font-size: 10px;">${item.outcome}</span></td>
+        <td style="font-size: 11px; color: var(--beds-text-secondary); max-width: 320px;">${escapeHtml(item.details)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function filterAuditTable() {
+    const actFilter = document.getElementById('filterAuditAction')?.value || '';
+    const outFilter = document.getElementById('filterAuditOutcome')?.value || '';
+    const searchQ = (document.getElementById('searchAuditInput')?.value || '').toLowerCase();
+
+    let list = auditLogsData;
+    if (actFilter) {
+      list = list.filter(x => x.action.includes(actFilter));
+    }
+    if (outFilter) {
+      if (outFilter === 'CRITICAL') {
+        list = list.filter(x => x.outcome === 'CRITICAL' || x.outcome === 'FAIL' || x.outcome === 'BLOCKED');
+      } else {
+        list = list.filter(x => x.outcome === outFilter);
+      }
+    }
+    if (searchQ) {
+      list = list.filter(x => 
+        x.auditId.toLowerCase().includes(searchQ) ||
+        x.actor.toLowerCase().includes(searchQ) ||
+        x.action.toLowerCase().includes(searchQ) ||
+        x.entityId.toLowerCase().includes(searchQ) ||
+        x.details.toLowerCase().includes(searchQ)
+      );
+    }
+    renderAuditTable(list);
+  }
+
+  function exportAuditLogCsv() {
+    let csv = 'AuditID,Timestamp,Actor,Role,Action,EntityID,Outcome,Details\n';
+    auditLogsData.forEach(r => {
+      csv += `"${r.auditId}","${r.timestamp}","${r.actor}","${r.role}","${r.action}","${r.entityId}","${r.outcome}","${(r.details || '').replace(/"/g, '""')}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `BALSONS_JTRWF_AUDIT_LOG_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
 </script>
