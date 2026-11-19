@@ -64,11 +64,11 @@
     <h2>1. Target Backend Configuration</h2>
     <div class="input-group">
       <label>Google Apps Script Web App Deployment URL</label>
-      <input type="text" id="targetUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+      <input type="text" id="targetUrl">
     </div>
     <div class="input-group">
       <label>Phase 0 Authentication Token</label>
-      <input type="text" id="authToken" value="BALSONS_JTRWF_GATE_PHASE0_DEV_KEY">
+      <input type="text" id="authToken">
     </div>
     <div class="btn-row">
       <button onclick="runAllProbes()">▶ Run All Phase 0 Diagnostic Probes</button>
@@ -98,7 +98,7 @@
         </tr>
         <tr>
           <td><strong>Auth Challenge Enforcement</strong></td>
-          <td>POST (with invalid token)</td>
+          <td>POST (system.db_probe with invalid token)</td>
           <td><span id="test2-status" class="status-pill status-pending">PENDING</span></td>
           <td id="test2-time">-</td>
           <td id="test2-detail">Verifies backend strictly denies invalid callers (401)</td>
@@ -175,8 +175,8 @@
 
     // Test 2: Auth Challenge Rejection
     setStatus('test2-status', 'running', 'RUNNING');
-    logConsole('\n[TEST 2] Testing 401 rejection with invalid token...');
-    const t2 = await BalsonsApi.send('system.ping', {}, 'INVALID_DUMMY_TOKEN');
+    logConsole('\n[TEST 2] Testing 401 rejection on protected action with invalid token...');
+    const t2 = await BalsonsApi.send('system.db_probe', {}, 'INVALID_DUMMY_TOKEN');
     document.getElementById('test2-time').textContent = (t2.clientDurationMs || 0) + ' ms';
     if (t2.status === 401) {
       setStatus('test2-status', 'pass', 'PASSED');

@@ -9,7 +9,7 @@ const APP_CONFIG = {
   VERSION: "1.1.0-phase0",
 
   // Live Deployed Google Apps Script Web App URL
-  BACKEND_API_URL: "https://script.google.com/macros/s/AKfycbxI16PJreCeo14jr1QtoF7vw6_4aN4se7ia28VZKTPaM9o7YwY_0Cu4WsOFTG3VRQx-0g/exec",
+  BACKEND_API_URL: "https://script.google.com/macros/s/AKfycbw40ALIhDx2FcbIm7q4aLqxSmzB8LwVd90hM0yDjT_s8L-0lX009PVoCphO-F75X0QoLg/exec",
 
   // Master Google Spreadsheet ID
   MASTER_SPREADSHEET_ID: "1yAuZOXc8WoC2TvTvnEWMrOyLl_50BRuJgDed_pdFT3o",
