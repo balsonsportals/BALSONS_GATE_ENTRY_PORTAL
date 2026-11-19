@@ -208,6 +208,11 @@ function doPost(e) {
         responseData = GateTransactionService.listGateMovements(payload.limit);
         break;
 
+      // ─── AUDIT TRAIL ──────────────────────────────────────────────────
+      case 'audit.list':
+        responseData = AuditService.listAuditLogs(payload.limit);
+        break;
+
       default:
         return createJsonResponse({
           success: false,

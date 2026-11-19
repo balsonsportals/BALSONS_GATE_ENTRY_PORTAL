@@ -31,8 +31,54 @@ const AuditService = {
         outcome || 'INFO',
         detailsStr
       ]);
+      return auditId;
     } catch (err) {
       Logger.log('AuditService Error: ' + err.message);
+      return null;
+    }
+  },
+
+  logAudit: function(session, action, entityId, outcome, details) {
+    var actor = session ? (session.username || session.fullName || 'SYSTEM') : 'SYSTEM';
+    var role = session ? (session.role || 'SYSTEM') : 'SYSTEM';
+    return this.log(actor, role, action, entityId, outcome, details);
+  },
+
+  logAction: function(session, action, entityId, outcome, details) {
+    var actor = session ? (session.username || session.fullName || 'SYSTEM') : 'SYSTEM';
+    var role = session ? (session.role || 'SYSTEM') : 'SYSTEM';
+    return this.log(actor, role, action, entityId, outcome, details);
+  },
+
+  listAuditLogs: function(limit) {
+    try {
+      var ssId = CONFIG.getSpreadsheetId();
+      if (!ssId) return [];
+      var ss = SpreadsheetApp.openById(ssId);
+      var sheet = ss.getSheetByName('AUDIT_LOG');
+      if (!sheet || sheet.getLastRow() < 2) return [];
+
+      limit = limit || 50;
+      var startRow = Math.max(2, sheet.getLastRow() - limit + 1);
+      var count = sheet.getLastRow() - startRow + 1;
+      var data = sheet.getRange(startRow, 1, count, 8).getValues();
+
+      var logs = data.map(function(r) {
+        return {
+          auditId: r[0],
+          timestamp: r[1],
+          actor: r[2],
+          role: r[3],
+          action: r[4],
+          entityId: r[5],
+          outcome: r[6],
+          details: r[7]
+        };
+      });
+      return logs.reverse();
+    } catch (err) {
+      Logger.log('Error listing audit logs: ' + err.message);
+      return [];
     }
   }
 };
