@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BALSONS Gate Entry — Phase 0 Connectivity Probe</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-bright: #f0f6fc;
+      --balsons-gold: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --blue: #3b82f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 32px 16px; display: flex; justify-content: center; }
+    .container { max-width: 860px; width: 100%; }
+    .header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .title h1 { font-size: 20px; color: var(--text-bright); }
+    .title p { font-size: 13px; color: #8b949e; margin-top: 4px; }
+    .badge { background: #1e293b; color: var(--balsons-gold); border: 1px solid var(--balsons-gold); padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .card h2 { font-size: 15px; color: var(--text-bright); margin-bottom: 12px; }
+    
+    .input-group { margin-bottom: 16px; }
+    .input-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #8b949e; }
+    .input-group input { width: 100%; background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; color: var(--text-bright); font-size: 13px; }
+    .input-group input:focus { outline: none; border-color: var(--blue); }
+
+    .btn-row { display: flex; gap: 12px; margin-top: 16px; }
+    button { background: var(--blue); color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.15s ease; }
+    button:hover { opacity: 0.9; }
+    button.secondary { background: #21262d; border: 1px solid var(--border); color: var(--text); }
+
+    .test-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .test-table th, .test-table td { padding: 12px 14px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); }
+    .test-table th { background: #0d1117; color: #8b949e; font-weight: 600; }
+    .status-pill { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+    .status-pending { background: #374151; color: #9ca3af; }
+    .status-running { background: #1e3a8a; color: #93c5fd; }
+    .status-pass { background: #064e3b; color: #6ee7b7; }
+    .status-fail { background: #7f1d1d; color: #fca5a5; }
+
+    pre { background: #0d1117; border: 1px solid var(--border); padding: 14px; border-radius: 6px; font-size: 12px; color: #a5d6ff; overflow-x: auto; margin-top: 12px; max-height: 240px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="title">
+      <h1>BALSONS JTRWF Gate Entry & Site Access Portal</h1>
+      <p>Architecture Standard: <strong>BALSONS-SAM-2026</strong> • Phase 0 Transport Verifier</p>
+    </div>
+    <span class="badge">PHASE 0 PROBE</span>
+  </div>
+
+  <div class="card">
+    <h2>1. Target Backend Configuration</h2>
+    <div class="input-group">
+      <label>Google Apps Script Web App Deployment URL</label>
+      <input type="text" id="targetUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+    </div>
+    <div class="input-group">
+      <label>Phase 0 Authentication Token</label>
+      <input type="text" id="authToken" value="BALSONS_JTRWF_GATE_PHASE0_DEV_KEY">
+    </div>
+    <div class="btn-row">
+      <button onclick="runAllProbes()">▶ Run All Phase 0 Diagnostic Probes</button>
+      <button class="secondary" onclick="clearLogs()">Clear Console</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Transport & Integration Acceptance Tests (Phase 0 Exit Gate)</h2>
+    <table class="test-table">
+      <thead>
+        <tr>
+          <th>Test Name</th>
+          <th>Protocol / Action</th>
+          <th>Status</th>
+          <th>Latency</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>CORS Simple-Request Transport</strong></td>
+          <td>POST (text/plain envelope)</td>
+          <td><span id="test1-status" class="status-pill status-pending">PENDING</span></td>
+          <td id="test1-time">-</td>
+          <td id="test1-detail">Verifies browser follows 302 redirect and reads response</td>
+        </tr>
+        <tr>
+          <td><strong>Auth Challenge Enforcement</strong></td>
+          <td>POST (with invalid token)</td>
+          <td><span id="test2-status" class="status-pill status-pending">PENDING</span></td>
+          <td id="test2-time">-</td>
+          <td id="test2-detail">Verifies backend strictly denies invalid callers (401)</td>
+        </tr>
+        <tr>
+          <td><strong>Database Connectivity Probe</strong></td>
+          <td>POST (system.db_probe)</td>
+          <td><span id="test3-status" class="status-pill status-pending">PENDING</span></td>
+          <td id="test3-time">-</td>
+          <td id="test3-detail">Verifies Apps Script is connected to Google Sheets</td>
+        </tr>
+        <tr>
+          <td><strong>Public Health Status</strong></td>
+          <td>GET (?action=health)</td>
+          <td><span id="test4-status" class="status-pill status-pending">PENDING</span></td>
+          <td id="test4-time">-</td>
+          <td id="test4-detail">Verifies gateway status reporting</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>3. Diagnostic Console & Raw JSON Payloads</h2>
+    <pre id="consoleOutput">// Click "Run All Phase 0 Diagnostic Probes" to inspect live transport logs...</pre>
+  </div>
+</div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api-client.js"></script>
+<script>
+  // Sync UI with config.js
+  document.getElementById('targetUrl').value = APP_CONFIG.BACKEND_API_URL;
+  document.getElementById('authToken').value = APP_CONFIG.DEV_AUTH_TOKEN;
+
+  function logConsole(msg) {
+    const el = document.getElementById('consoleOutput');
+    el.textContent += '\n' + msg;
+  }
+  function clearLogs() {
+    document.getElementById('consoleOutput').textContent = '// Console cleared.';
+  }
+
+  function setStatus(id, state, text) {
+    const el = document.getElementById(id);
+    el.className = 'status-pill status-' + state;
+    el.textContent = text;
+  }
+
+  async function runAllProbes() {
+    clearLogs();
+    APP_CONFIG.BACKEND_API_URL = document.getElementById('targetUrl').value.trim();
+    APP_CONFIG.DEV_AUTH_TOKEN = document.getElementById('authToken').value.trim();
+
+    if (!APP_CONFIG.BACKEND_API_URL || APP_CONFIG.BACKEND_API_URL.includes('YOUR_DEPLOYMENT_ID')) {
+      alert('Please enter your valid Google Apps Script Web App URL first.');
+      return;
+    }
+
+    logConsole(`[PROBE] Target URL: ${APP_CONFIG.BACKEND_API_URL}`);
+
+    // Test 1: CORS Simple-Request POST
+    setStatus('test1-status', 'running', 'RUNNING');
+    logConsole('[TEST 1] Dispatching POST system.ping via text/plain...');
+    const t1 = await BalsonsApi.send('system.ping', { test: 'Phase0 Handshake' });
+    document.getElementById('test1-time').textContent = (t1.clientDurationMs || 0) + ' ms';
+    if (t1.success && t1.status === 200) {
+      setStatus('test1-status', 'pass', 'PASSED');
+      logConsole(`[TEST 1 PASS] Handshake successful! Latency: ${t1.clientDurationMs}ms\nResponse: ` + JSON.stringify(t1.data, null, 2));
+    } else {
+      setStatus('test1-status', 'fail', 'FAILED');
+      logConsole(`[TEST 1 FAIL] Error: ` + JSON.stringify(t1.error, null, 2));
+    }
+
+    // Test 2: Auth Challenge Rejection
+    setStatus('test2-status', 'running', 'RUNNING');
+    logConsole('\n[TEST 2] Testing 401 rejection with invalid token...');
+    const t2 = await BalsonsApi.send('system.ping', {}, 'INVALID_DUMMY_TOKEN');
+    document.getElementById('test2-time').textContent = (t2.clientDurationMs || 0) + ' ms';
+    if (t2.status === 401) {
+      setStatus('test2-status', 'pass', 'PASSED');
+      logConsole(`[TEST 2 PASS] Backend correctly rejected unauthorized call (401 AUTH_REQUIRED)`);
+    } else {
+      setStatus('test2-status', 'fail', 'FAILED');
+      logConsole(`[TEST 2 FAIL] Expected 401 status, got: ` + t2.status);
+    }
+
+    // Test 3: Database Connectivity
+    setStatus('test3-status', 'running', 'RUNNING');
+    logConsole('\n[TEST 3] Testing Google Sheets database link via system.db_probe...');
+    const t3 = await BalsonsApi.send('system.db_probe', {});
+    document.getElementById('test3-time').textContent = (t3.clientDurationMs || 0) + ' ms';
+    if (t3.success && t3.data && t3.data.databaseLinked) {
+      setStatus('test3-status', 'pass', 'PASSED');
+      document.getElementById('test3-detail').textContent = t3.data.statusMessage;
+      logConsole(`[TEST 3 PASS] ${t3.data.statusMessage}`);
+    } else {
+      setStatus('test3-status', 'fail', 'NO DB');
+      document.getElementById('test3-detail').textContent = t3.data ? t3.data.statusMessage : 'DB Error';
+      logConsole(`[TEST 3 INFO] ${t3.data ? t3.data.statusMessage : 'Ensure SPREADSHEET_ID is set in Apps Script'}`);
+    }
+
+    // Test 4: Public Health Check (GET)
+    setStatus('test4-status', 'running', 'RUNNING');
+    logConsole('\n[TEST 4] Testing GET ?action=health...');
+    const t4 = await BalsonsApi.healthCheck();
+    if (t4.success && t4.status === 200) {
+      setStatus('test4-status', 'pass', 'PASSED');
+      document.getElementById('test4-time').textContent = 'OK';
+      logConsole(`[TEST 4 PASS] Public health endpoint is active (${t4.version})`);
+    } else {
+      setStatus('test4-status', 'fail', 'FAILED');
+      logConsole(`[TEST 4 FAIL] Error: ` + JSON.stringify(t4.error));
+    }
+
+    logConsole('\n[PROBE COMPLETE] Phase 0 diagnostic cycle finished.');
+  }
+</script>
+
+</body>
+</html>
