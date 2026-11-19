@@ -799,6 +799,16 @@
   </div>
 </nav>
 
+<!-- Mobile Swipeable Quick-Pill Bar (Smartphone & Tablet Optimized) -->
+<div class="beds-mobile-pill-bar">
+  <button class="beds-btn beds-btn-sm beds-btn-primary" onclick="switchTab('radar')">🧭 Radar</button>
+  <button class="beds-btn beds-btn-sm beds-btn-secondary" onclick="switchTab('gate-dossier-360')" style="color: var(--beds-teal-primary); font-weight: 700;">📄 360° Dossier</button>
+  <button class="beds-btn beds-btn-sm beds-btn-secondary" onclick="switchTab('clearance')">🦺 Security Clearance</button>
+  <button class="beds-btn beds-btn-sm beds-btn-secondary" onclick="switchTab('personnel')">👥 Gate Pass</button>
+  <button class="beds-btn beds-btn-sm beds-btn-secondary" onclick="switchTab('vehicles')">🚛 Vehicles</button>
+  <button class="beds-btn beds-btn-sm beds-btn-secondary" onclick="switchTab('materials')">📦 Materials RGP</button>
+</div>
+
 <main>
   <!-- TAB 1: COMMAND RADAR & MUSTER -->
   <section id="tab-radar" class="section-view active">
@@ -2364,6 +2374,7 @@
 <script src="assets/js/api-client.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/dossier-360.js"></script>
+<script src="assets/js/beds-workspace.js"></script>
 <script>
   function switchTab(tabName) {
     // Direct nav tabs
