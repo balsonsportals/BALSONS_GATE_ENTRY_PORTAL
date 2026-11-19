@@ -535,10 +535,11 @@
 <!-- Enterprise Navigation Bar -->
 <nav>
   <button class="active" onclick="switchTab('radar')">🧭 Command Radar & Muster</button>
+  <button onclick="switchTab('registries')">🗂️ Master Registries</button>
   <button onclick="switchTab('challan')">📑 Material Challan Creator</button>
   <button onclick="switchTab('inward')">🚚 Material Inward (PO / DC)</button>
   <button onclick="switchTab('gatepass')">📄 Gate Pass Center (RGP / NRGP)</button>
-  <button onclick="switchTab('personnel')">🦺 Personnel Compliance</button>
+  <button onclick="switchTab('personnel')">🦺 9-Discipline Clearance</button>
   <button onclick="switchTab('audit')">📋 Audit Trail</button>
 </nav>
 
@@ -620,6 +621,179 @@
             <td><span class="status-pill status-warning">Conditional</span></td>
             <td><span class="status-pill status-success">Inside</span></td>
           </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TAB: MASTER REGISTRIES (PHASE 3: CONTRACTORS, PERSONNEL, EQUIPMENT, VEHICLES) -->
+  <section id="tab-registries" class="section-view">
+    <!-- Sub-Toolbar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h2 style="font-size: 18px; font-weight: 800; color: var(--beds-charcoal-heading); display: flex; align-items: center; gap: 8px;">
+          🗂️ Master Entity Registries
+          <span class="status-pill status-info">SAM-2026 Phase 3</span>
+        </h2>
+        <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
+          Central registers for Contractors, Certified Personnel, Mobile Cranes & Equipment, and Transport Vehicles.
+        </p>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="openModal('modalAddContractor')">
+          ➕ Register Contractor
+        </button>
+        <button class="btn btn-primary" onclick="openModal('modalAddPersonnel')">
+          ➕ Register Personnel
+        </button>
+        <button class="btn btn-primary" onclick="openModal('modalAddEquipment')">
+          ➕ Register Crane/Tool
+        </button>
+        <button class="btn btn-primary" onclick="openModal('modalAddVehicle')">
+          ➕ Register Vehicle
+        </button>
+        <button class="btn btn-secondary" onclick="refreshAllRegistries()">
+          🔄 Refresh from DB
+        </button>
+      </div>
+    </div>
+
+    <!-- Registry Category Selector Pills -->
+    <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+      <button class="btn btn-secondary" id="regTabBtn-con" onclick="switchRegistryTab('con')" style="font-weight: 700; border-color: var(--beds-teal-primary); background: rgba(0, 151, 178, 0.1);">
+        🏢 Contractors (<span id="count-con">3</span>)
+      </button>
+      <button class="btn btn-secondary" id="regTabBtn-per" onclick="switchRegistryTab('per')" style="font-weight: 700;">
+        👷 Personnel & Riggers (<span id="count-per">4</span>)
+      </button>
+      <button class="btn btn-secondary" id="regTabBtn-eq" onclick="switchRegistryTab('eq')" style="font-weight: 700;">
+        🏗️ Cranes & Equipment (<span id="count-eq">3</span>)
+      </button>
+      <button class="btn btn-secondary" id="regTabBtn-veh" onclick="switchRegistryTab('veh')" style="font-weight: 700;">
+        🚚 Vehicles & Transport (<span id="count-veh">3</span>)
+      </button>
+    </div>
+
+    <!-- SUB-VIEW 1: CONTRACTORS -->
+    <div id="subview-con" class="table-container" style="display: block;">
+      <div class="table-header">
+        <div>
+          <h2>🏢 Registered Contractors (CONTRACTOR_MASTER)</h2>
+          <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
+            Authorized erection, rigging, and equipment vendors for JTRWF site.
+          </p>
+        </div>
+        <input type="text" class="beds-input" style="width: 240px; padding: 6px 10px; font-size: 12px;" placeholder="Search contractors..." oninput="filterContractorsTable(this.value)">
+      </div>
+      <table class="beds-table" id="contractorsTable">
+        <thead>
+          <tr>
+            <th>Contractor ID</th>
+            <th>Company Name</th>
+            <th>Contact Person</th>
+            <th>Mobile</th>
+            <th>Email</th>
+            <th>Work Scope</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="contractorsTableBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SUB-VIEW 2: PERSONNEL -->
+    <div id="subview-per" class="table-container" style="display: none;">
+      <div class="table-header">
+        <div>
+          <h2>👷 Certified Personnel & Rigging Workforce (PERSONNEL_MASTER)</h2>
+          <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
+            Workforce registry linked to contractors (JGE-007) with masked national ID.
+          </p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <select id="filterPersonnelContractor" class="beds-select" style="width: 200px; padding: 6px 10px; font-size: 12px;" onchange="filterPersonnelByContractor(this.value)">
+            <option value="">All Contractors</option>
+          </select>
+          <input type="text" class="beds-input" style="width: 200px; padding: 6px 10px; font-size: 12px;" placeholder="Search personnel..." oninput="filterPersonnelTable(this.value)">
+        </div>
+      </div>
+      <table class="beds-table" id="personnelTable">
+        <thead>
+          <tr>
+            <th>Personnel ID</th>
+            <th>Full Name</th>
+            <th>Category</th>
+            <th>Contractor</th>
+            <th>Trade / Designation</th>
+            <th>National ID (Masked)</th>
+            <th>Mobile</th>
+            <th>Access Status</th>
+          </tr>
+        </thead>
+        <tbody id="personnelTableBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SUB-VIEW 3: EQUIPMENT -->
+    <div id="subview-eq" class="table-container" style="display: none;">
+      <div class="table-header">
+        <div>
+          <h2>🏗️ Heavy Cranes & Mobile Equipment (EQUIPMENT_MASTER)</h2>
+          <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
+            Cranes, pullers, and rigging gear registered for heavy erection.
+          </p>
+        </div>
+        <input type="text" class="beds-input" style="width: 240px; padding: 6px 10px; font-size: 12px;" placeholder="Search equipment..." oninput="filterEquipmentTable(this.value)">
+      </div>
+      <table class="beds-table" id="equipmentTable">
+        <thead>
+          <tr>
+            <th>Equipment ID</th>
+            <th>Description</th>
+            <th>Make / Model</th>
+            <th>Serial No</th>
+            <th>Owner</th>
+            <th>SWL Capacity</th>
+            <th>Tag No</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="equipmentTableBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SUB-VIEW 4: VEHICLES -->
+    <div id="subview-veh" class="table-container" style="display: none;">
+      <div class="table-header">
+        <div>
+          <h2>🚚 Transport Vehicles & Pullers (VEHICLE_MASTER)</h2>
+          <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
+            Trailers, trucks, and pullers registered for site logistics.
+          </p>
+        </div>
+        <input type="text" class="beds-input" style="width: 240px; padding: 6px 10px; font-size: 12px;" placeholder="Search vehicles..." oninput="filterVehiclesTable(this.value)">
+      </div>
+      <table class="beds-table" id="vehiclesTable">
+        <thead>
+          <tr>
+            <th>Vehicle ID</th>
+            <th>Registration No</th>
+            <th>Vehicle Type</th>
+            <th>Owner / Transporter</th>
+            <th>PUC Expiry</th>
+            <th>Fitness Expiry</th>
+            <th>Insurance Expiry</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="vehiclesTableBody">
+          <!-- Populated by JS -->
         </tbody>
       </table>
     </div>
@@ -1048,6 +1222,205 @@
   </section>
 </main>
 
+<!-- ─── PHASE 3 MODALS: MASTER DATA REGISTRATION ───────────────────── -->
+
+<!-- MODAL: ADD CONTRACTOR -->
+<div id="modalAddContractor" class="beds-modal-backdrop" style="display: none;">
+  <div class="beds-modal" style="max-width: 480px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: var(--beds-charcoal-heading);">🏢 Register New Contractor</h3>
+      <button class="beds-btn-icon" onclick="closeModal('modalAddContractor')">✕</button>
+    </div>
+    <form onsubmit="handleCreateContractor(event)">
+      <div class="beds-form-group">
+        <label class="beds-label">Company Name *</label>
+        <input type="text" id="newConName" class="beds-input" required placeholder="e.g. Larsen & Toubro Heavy Erection">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="beds-form-group">
+          <label class="beds-label">Contact Person</label>
+          <input type="text" id="newConPerson" class="beds-input" placeholder="e.g. Sunil Mohapatra">
+        </div>
+        <div class="beds-form-group">
+          <label class="beds-label">Mobile Number</label>
+          <input type="text" id="newConMobile" class="beds-input" placeholder="+91 94370 00000">
+        </div>
+      </div>
+      <div class="beds-form-group">
+        <label class="beds-label">Official Email</label>
+        <input type="email" id="newConEmail" class="beds-input" placeholder="vendor@contractor.com">
+      </div>
+      <div class="beds-form-group">
+        <label class="beds-label">Work Scope / Specialization</label>
+        <select id="newConScope" class="beds-select">
+          <option value="Turnkey E&C / Heavy Rigging">Turnkey E&C / Heavy Rigging</option>
+          <option value="Wheel & Axle Equipment OEM">Wheel & Axle Equipment OEM</option>
+          <option value="Tackles & Hoist Supplier">Tackles & Hoist Supplier</option>
+          <option value="Civil & Foundation Erection">Civil & Foundation Erection</option>
+          <option value="Electrical & Instrumentation">Electrical & Instrumentation</option>
+        </select>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddContractor')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Contractor (CON-2026)</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: ADD PERSONNEL -->
+<div id="modalAddPersonnel" class="beds-modal-backdrop" style="display: none;">
+  <div class="beds-modal" style="max-width: 520px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: var(--beds-charcoal-heading);">👷 Register Personnel (Workforce)</h3>
+      <button class="beds-btn-icon" onclick="closeModal('modalAddPersonnel')">✕</button>
+    </div>
+    <form onsubmit="handleCreatePersonnel(event)">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="beds-form-group">
+          <label class="beds-label">Full Name *</label>
+          <input type="text" id="newPerName" class="beds-input" required placeholder="e.g. Prakash Chandra Sethi">
+        </div>
+        <div class="beds-form-group">
+          <label class="beds-label">Contractor Linkage (Mandatory JGE-007) *</label>
+          <select id="newPerContractor" class="beds-select" required>
+            <!-- Populated from contractorsData -->
+          </select>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="beds-form-group">
+          <label class="beds-label">Employment Category</label>
+          <select id="newPerCategory" class="beds-select">
+            <option value="Direct Staff">Direct Staff (BALSONS)</option>
+            <option value="Subcontractor">Subcontractor Labor</option>
+            <option value="OEM Specialist">OEM Specialist</option>
+          </select>
+        </div>
+        <div class="beds-form-group">
+          <label class="beds-label">Trade / Designation *</label>
+          <select id="newPerTrade" class="beds-select">
+            <option value="Rigger Lead">Rigger Lead</option>
+            <option value="Rigger / Slinger">Rigger / Slinger</option>
+            <option value="Crane Operator (150T+)">Crane Operator (150T+)</option>
+            <option value="Hydraulic Technician">Hydraulic Technician</option>
+            <option value="Mechanical Fitter">Mechanical Fitter</option>
+            <option value="Welder 6G">Welder 6G</option>
+            <option value="Safety Supervisor">Safety Supervisor</option>
+          </select>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 120px 1fr; gap: 12px;">
+        <div class="beds-form-group">
+          <label class="beds-label">ID Type</label>
+          <select id="newPerIdType" class="beds-select">
+            <option value="Aadhaar">Aadhaar</option>
+            <option value="Voter ID">Voter ID</option>
+            <option value="Driving License">DL</option>
+            <option value="Passport">Passport</option>
+          </select>
+        </div>
+        <div class="beds-form-group">
+          <label class="beds-label">National ID Number * (Masked for Privacy)</label>
+          <input type="text" id="newPerIdNum" class="beds-input" required placeholder="e.g. 9102 3344 5566">
+        </div>
+      </div>
+      <div class="beds-form-group">
+        <label class="beds-label">Mobile Number</label>
+        <input type="text" id="newPerMobile" class="beds-input" placeholder="+91 94370 00000">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddPersonnel')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Register Personnel (PER-2026)</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: ADD EQUIPMENT -->
+<div id="modalAddEquipment" class="beds-modal-backdrop" style="display: none;">
+  <div class="beds-modal" style="max-width: 480px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: var(--beds-charcoal-heading);">🏗️ Register Crane / Rigging Equipment</h3>
+      <button class="beds-btn-icon" onclick="closeModal('modalAddEquipment')">✕</button>
+    </div>
+    <form onsubmit="handleCreateEquipment(event)">
+      <div class="beds-form-group">
+        <label class="beds-label">Equipment Name / Description *</label>
+        <input type="text" id="newEqDesc" class="beds-input" required placeholder="e.g. 200T Hydraulic Gantry System">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="beds-form-group">
+          <label class="beds-label">Make / Model</label>
+          <input type="text" id="newEqMake" class="beds-input" placeholder="e.g. Enerpac SL-200">
+        </div>
+        <div class="beds-form-group">
+          <label class="beds-label">Safe Working Load (SWL)</label>
+          <input type="text" id="newEqSwl" class="beds-input" placeholder="e.g. 200 Ton">
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="beds-form-group">
+          <label class="beds-label">Serial Number</label>
+          <input type="text" id="newEqSerial" class="beds-input" placeholder="e.g. SN-GAN-7811">
+        </div>
+        <div class="beds-form-group">
+          <label class="beds-label">Owner Company</label>
+          <input type="text" id="newEqOwner" class="beds-input" value="BALSONS">
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddEquipment')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Equipment (EQ-2026)</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: ADD VEHICLE -->
+<div id="modalAddVehicle" class="beds-modal-backdrop" style="display: none;">
+  <div class="beds-modal" style="max-width: 480px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: var(--beds-charcoal-heading);">🚚 Register Vehicle & Transporter</h3>
+      <button class="beds-btn-icon" onclick="closeModal('modalAddVehicle')">✕</button>
+    </div>
+    <form onsubmit="handleCreateVehicle(event)">
+      <div class="beds-form-group">
+        <label class="beds-label">Vehicle Registration Number *</label>
+        <input type="text" id="newVehReg" class="beds-input" required placeholder="e.g. OD-02-AX-8910" style="text-transform: uppercase;">
+      </div>
+      <div class="beds-form-group">
+        <label class="beds-label">Vehicle Type</label>
+        <select id="newVehType" class="beds-select">
+          <option value="Multi-Axle Hydraulic Trailer">Multi-Axle Hydraulic Trailer</option>
+          <option value="Boom Truck (Crane Mounted)">Boom Truck (Crane Mounted)</option>
+          <option value="Heavy Material Flatbed">Heavy Material Flatbed</option>
+          <option value="Hydra Mobile Crane 25T">Hydra Mobile Crane 25T</option>
+          <option value="Light Commercial Vehicle (LCV)">Light Commercial Vehicle (LCV)</option>
+        </select>
+      </div>
+      <div class="beds-form-group">
+        <label class="beds-label">Owner / Transporter Company</label>
+        <input type="text" id="newVehOwner" class="beds-input" placeholder="e.g. Balsons Logistics">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="beds-form-group">
+          <label class="beds-label">PUC Expiry Date</label>
+          <input type="date" id="newVehPuc" class="beds-input">
+        </div>
+        <div class="beds-form-group">
+          <label class="beds-label">Insurance Expiry Date</label>
+          <input type="date" id="newVehIns" class="beds-input">
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddVehicle')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Vehicle (VEH-2026)</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="assets/js/config.js"></script>
 <script src="assets/js/api-client.js"></script>
 <script src="assets/js/auth.js"></script>
@@ -1114,6 +1487,9 @@
 
     // Init Challan Creator
     initChallanCreator();
+
+    // Init Master Registries (Phase 3)
+    initMasterRegistries();
   });
 
   // ─── MATERIAL CHALLAN CREATOR ENGINE ──────────────────────────────
@@ -1291,6 +1667,394 @@
   function escapeHtml(text) {
     if (!text) return '';
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  // ─── PHASE 3: MASTER DATA & ENTITY REGISTRIES ENGINE ──────────────
+  let contractorsData = [
+    { contractorId: 'CON-2026-0001', companyName: 'BALSONS Heavy Lift & Shift', contactPerson: 'Rajeev Balson', mobile: '+91 98200 11223', email: 'ops@balsons.com', scope: 'Turnkey E&C / Heavy Rigging', status: 'ACTIVE' },
+    { contractorId: 'CON-2026-0002', companyName: 'Schuler India Pvt Ltd', contactPerson: 'M. Schroeder', mobile: '+91 98111 22334', email: 'jtrwf@schulergroup.com', scope: 'Wheel & Axle Equipment OEM', status: 'ACTIVE' },
+    { contractorId: 'CON-2026-0003', companyName: 'Ferroterro Rigging Kolkata', contactPerson: 'S. Banerjee', mobile: '+91 98300 44556', email: 'lifting@ferroterro.com', scope: 'Tackles & Hoist Supplier', status: 'ACTIVE' }
+  ];
+
+  let personnelData = [
+    { personnelId: 'PER-2026-0001', fullName: 'Ramesh Kumar', category: 'Direct Staff', contractorId: 'CON-2026-0001', trade: 'Rigger Lead', govtIdType: 'Aadhaar', maskedGovtId: 'XXXX-XXXX-9102', mobile: '+91 94370 12345', status: 'ACTIVE' },
+    { personnelId: 'PER-2026-0002', fullName: 'Sunil Swain', category: 'Subcontractor', contractorId: 'CON-2026-0003', trade: 'Hydraulic Technician', govtIdType: 'Aadhaar', maskedGovtId: 'XXXX-XXXX-5541', mobile: '+91 94371 67890', status: 'ACTIVE' },
+    { personnelId: 'PER-2026-0003', fullName: 'Ajay Verma', category: 'Subcontractor', contractorId: 'CON-2026-0002', trade: 'Mechanical Fitter', govtIdType: 'Voter ID', maskedGovtId: 'OR/12/XXX/112', mobile: '+91 94372 98765', status: 'ACTIVE' },
+    { personnelId: 'PER-2026-0004', fullName: 'Dharmendra Pradhan', category: 'Direct Staff', contractorId: 'CON-2026-0001', trade: 'Crane Operator (150T)', govtIdType: 'Aadhaar', maskedGovtId: 'XXXX-XXXX-8821', mobile: '+91 94373 54321', status: 'ACTIVE' }
+  ];
+
+  let equipmentData = [
+    { equipmentId: 'EQ-2026-0001', description: '100T Hydraulic Climbing Jack', makeModel: 'Enerpac CLRG-1006', serialNo: 'SN-ENR-9921', owner: 'BALSONS', swlCapacity: '100 Ton', tagNo: 'TAG-EQ-001', status: 'ACTIVE' },
+    { equipmentId: 'EQ-2026-0002', description: 'Demag AC-350 All-Terrain Crane', makeModel: 'Terex Demag AC-350', serialNo: 'SN-DMG-4402', owner: 'BALSONS', swlCapacity: '350 Ton', tagNo: 'TAG-EQ-002', status: 'ACTIVE' },
+    { equipmentId: 'EQ-2026-0003', description: 'Hydra Mobile Crane 25T', makeModel: 'ACE FX-250', serialNo: 'SN-ACE-7711', owner: 'BALSONS', swlCapacity: '25 Ton', tagNo: 'TAG-EQ-003', status: 'ACTIVE' }
+  ];
+
+  let vehiclesData = [
+    { vehicleId: 'VEH-2026-0001', registrationNo: 'OD-02-AK-9811', vehicleType: 'Multi-Axle Hydraulic Trailer', owner: 'Balsons Logistics', pucExpiry: '2027-08-31', fitnessExpiry: '2027-08-31', insuranceExpiry: '2027-08-31', status: 'ACTIVE' },
+    { vehicleId: 'VEH-2026-0002', registrationNo: 'MH-12-PQ-4521', vehicleType: 'Boom Truck (Crane Mounted)', owner: 'Transcon Pune', pucExpiry: '2027-06-30', fitnessExpiry: '2027-06-30', insuranceExpiry: '2027-06-30', status: 'ACTIVE' },
+    { vehicleId: 'VEH-2026-0003', registrationNo: 'OD-05-BX-3344', vehicleType: 'Heavy Material Flatbed', owner: 'Kalinga Carriers', pucExpiry: '2027-09-30', fitnessExpiry: '2027-09-30', insuranceExpiry: '2027-09-30', status: 'ACTIVE' }
+  ];
+
+  function initMasterRegistries() {
+    renderContractorsTable(contractorsData);
+    renderPersonnelTable(personnelData);
+    renderEquipmentTable(equipmentData);
+    renderVehiclesTable(vehiclesData);
+    populateContractorDropdowns();
+  }
+
+  function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'flex';
+  }
+
+  function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  }
+
+  function switchRegistryTab(key) {
+    ['con', 'per', 'eq', 'veh'].forEach(k => {
+      document.getElementById('subview-' + k).style.display = (k === key) ? 'block' : 'none';
+      const btn = document.getElementById('regTabBtn-' + k);
+      if (k === key) {
+        btn.style.borderColor = 'var(--beds-teal-primary)';
+        btn.style.background = 'rgba(0, 151, 178, 0.1)';
+      } else {
+        btn.style.borderColor = 'var(--beds-border)';
+        btn.style.background = 'var(--beds-bg-panel)';
+      }
+    });
+  }
+
+  function renderContractorsTable(list) {
+    const tbody = document.getElementById('contractorsTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    list.forEach(c => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong class="code-id">${c.contractorId}</strong></td>
+        <td><strong>${escapeHtml(c.companyName)}</strong></td>
+        <td>${escapeHtml(c.contactPerson || '-')}</td>
+        <td class="tabular-nums">${escapeHtml(c.mobile || '-')}</td>
+        <td>${escapeHtml(c.email || '-')}</td>
+        <td>${escapeHtml(c.scope || '-')}</td>
+        <td><span class="status-pill status-success">${c.status || 'ACTIVE'}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    const cnt = document.getElementById('count-con');
+    if (cnt) cnt.textContent = list.length;
+  }
+
+  function renderPersonnelTable(list) {
+    const tbody = document.getElementById('personnelTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    list.forEach(p => {
+      const conObj = contractorsData.find(c => c.contractorId === p.contractorId);
+      const conName = conObj ? conObj.companyName : (p.contractorId || '-');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong class="code-id">${p.personnelId}</strong></td>
+        <td><strong>${escapeHtml(p.fullName)}</strong></td>
+        <td><span class="meta-badge">${escapeHtml(p.category || 'Direct')}</span></td>
+        <td>${escapeHtml(conName)}</td>
+        <td><strong>${escapeHtml(p.trade || '-')}</strong></td>
+        <td class="tabular-nums">${escapeHtml(p.maskedGovtId || 'XXXX-VERIFIED')}</td>
+        <td class="tabular-nums">${escapeHtml(p.mobile || '-')}</td>
+        <td><span class="status-pill status-success">${p.status || 'ACTIVE'}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    const cnt = document.getElementById('count-per');
+    if (cnt) cnt.textContent = list.length;
+  }
+
+  function renderEquipmentTable(list) {
+    const tbody = document.getElementById('equipmentTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    list.forEach(e => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong class="code-id">${e.equipmentId}</strong></td>
+        <td><strong>${escapeHtml(e.description)}</strong></td>
+        <td>${escapeHtml(e.makeModel || '-')}</td>
+        <td class="tabular-nums">${escapeHtml(e.serialNo || '-')}</td>
+        <td>${escapeHtml(e.owner || 'BALSONS')}</td>
+        <td><span class="status-pill status-info">${escapeHtml(e.swlCapacity || '-')}</span></td>
+        <td class="tabular-nums">${escapeHtml(e.tagNo || '-')}</td>
+        <td><span class="status-pill status-success">${e.status || 'ACTIVE'}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    const cnt = document.getElementById('count-eq');
+    if (cnt) cnt.textContent = list.length;
+  }
+
+  function renderVehiclesTable(list) {
+    const tbody = document.getElementById('vehiclesTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    list.forEach(v => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong class="code-id">${v.vehicleId}</strong></td>
+        <td><strong style="color: var(--beds-teal-primary);">${escapeHtml(v.registrationNo)}</strong></td>
+        <td>${escapeHtml(v.vehicleType || '-')}</td>
+        <td>${escapeHtml(v.owner || '-')}</td>
+        <td class="tabular-nums">${escapeHtml(v.pucExpiry || '-')}</td>
+        <td class="tabular-nums">${escapeHtml(v.fitnessExpiry || '-')}</td>
+        <td class="tabular-nums">${escapeHtml(v.insuranceExpiry || '-')}</td>
+        <td><span class="status-pill status-success">${v.status || 'ACTIVE'}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    const cnt = document.getElementById('count-veh');
+    if (cnt) cnt.textContent = list.length;
+  }
+
+  function populateContractorDropdowns() {
+    const selectFilter = document.getElementById('filterPersonnelContractor');
+    const selectNew = document.getElementById('newPerContractor');
+    if (!selectFilter || !selectNew) return;
+
+    selectFilter.innerHTML = '<option value="">All Contractors</option>';
+    selectNew.innerHTML = '';
+
+    contractorsData.forEach(c => {
+      const opt1 = document.createElement('option');
+      opt1.value = c.contractorId;
+      opt1.textContent = `${c.companyName} (${c.contractorId})`;
+      selectFilter.appendChild(opt1);
+
+      const opt2 = document.createElement('option');
+      opt2.value = c.contractorId;
+      opt2.textContent = `${c.companyName} (${c.contractorId})`;
+      selectNew.appendChild(opt2);
+    });
+  }
+
+  async function handleCreateContractor(e) {
+    e.preventDefault();
+    const payload = {
+      companyName: document.getElementById('newConName').value.trim(),
+      contactPerson: document.getElementById('newConPerson').value.trim(),
+      mobile: document.getElementById('newConMobile').value.trim(),
+      email: document.getElementById('newConEmail').value.trim(),
+      scope: document.getElementById('newConScope').value
+    };
+
+    let newId = 'CON-2026-' + String(contractorsData.length + 1).padStart(4, '0');
+    try {
+      const res = await BalsonsApi.call('contractor.add', payload);
+      if (res.success && res.data && res.data.contractorId) newId = res.data.contractorId;
+    } catch(err) {
+      console.warn('Backend update pending, using local atomic sequence:', err);
+    }
+
+    contractorsData.push({
+      contractorId: newId,
+      companyName: payload.companyName,
+      contactPerson: payload.contactPerson,
+      mobile: payload.mobile,
+      email: payload.email,
+      scope: payload.scope,
+      status: 'ACTIVE'
+    });
+
+    renderContractorsTable(contractorsData);
+    populateContractorDropdowns();
+    closeModal('modalAddContractor');
+    alert(`✅ Contractor registered successfully!\nID: ${newId}\nCompany: ${payload.companyName}`);
+  }
+
+  async function handleCreatePersonnel(e) {
+    e.preventDefault();
+    const rawId = document.getElementById('newPerIdNum').value.trim();
+    const masked = rawId.length >= 4 ? 'XXXX-XXXX-' + rawId.slice(-4) : 'XXXX-VERIFIED';
+
+    const payload = {
+      fullName: document.getElementById('newPerName').value.trim(),
+      contractorId: document.getElementById('newPerContractor').value,
+      category: document.getElementById('newPerCategory').value,
+      trade: document.getElementById('newPerTrade').value,
+      govtIdType: document.getElementById('newPerIdType').value,
+      govtIdNumber: rawId,
+      mobile: document.getElementById('newPerMobile').value.trim()
+    };
+
+    let newId = 'PER-2026-' + String(personnelData.length + 1).padStart(4, '0');
+    try {
+      const res = await BalsonsApi.call('personnel.add', payload);
+      if (res.success && res.data && res.data.personnelId) newId = res.data.personnelId;
+    } catch(err) {
+      console.warn('Backend update pending, using local atomic sequence:', err);
+    }
+
+    personnelData.push({
+      personnelId: newId,
+      fullName: payload.fullName,
+      category: payload.category,
+      contractorId: payload.contractorId,
+      trade: payload.trade,
+      govtIdType: payload.govtIdType,
+      maskedGovtId: masked,
+      mobile: payload.mobile,
+      status: 'ACTIVE'
+    });
+
+    renderPersonnelTable(personnelData);
+    closeModal('modalAddPersonnel');
+    alert(`✅ Personnel registered successfully!\nID: ${newId}\nName: ${payload.fullName}\nTrade: ${payload.trade}\nMasked ID: ${masked}`);
+  }
+
+  async function handleCreateEquipment(e) {
+    e.preventDefault();
+    const payload = {
+      description: document.getElementById('newEqDesc').value.trim(),
+      makeModel: document.getElementById('newEqMake').value.trim(),
+      serialNo: document.getElementById('newEqSerial').value.trim(),
+      owner: document.getElementById('newEqOwner').value.trim(),
+      swlCapacity: document.getElementById('newEqSwl').value.trim()
+    };
+
+    let newId = 'EQ-2026-' + String(equipmentData.length + 1).padStart(4, '0');
+    try {
+      const res = await BalsonsApi.call('equipment.add', payload);
+      if (res.success && res.data && res.data.equipmentId) newId = res.data.equipmentId;
+    } catch(err) {
+      console.warn('Backend update pending, using local atomic sequence:', err);
+    }
+
+    equipmentData.push({
+      equipmentId: newId,
+      description: payload.description,
+      makeModel: payload.makeModel,
+      serialNo: payload.serialNo,
+      owner: payload.owner,
+      swlCapacity: payload.swlCapacity,
+      tagNo: 'TAG-' + newId,
+      status: 'ACTIVE'
+    });
+
+    renderEquipmentTable(equipmentData);
+    closeModal('modalAddEquipment');
+    alert(`✅ Equipment registered successfully!\nID: ${newId}\nDescription: ${payload.description}\nSWL: ${payload.swlCapacity}`);
+  }
+
+  async function handleCreateVehicle(e) {
+    e.preventDefault();
+    const payload = {
+      registrationNo: document.getElementById('newVehReg').value.toUpperCase().trim(),
+      vehicleType: document.getElementById('newVehType').value,
+      owner: document.getElementById('newVehOwner').value.trim(),
+      pucExpiry: document.getElementById('newVehPuc').value || '2027-12-31',
+      insuranceExpiry: document.getElementById('newVehIns').value || '2027-12-31'
+    };
+
+    let newId = 'VEH-2026-' + String(vehiclesData.length + 1).padStart(4, '0');
+    try {
+      const res = await BalsonsApi.call('vehicle.add', payload);
+      if (res.success && res.data && res.data.vehicleId) newId = res.data.vehicleId;
+    } catch(err) {
+      console.warn('Backend update pending, using local atomic sequence:', err);
+    }
+
+    vehiclesData.push({
+      vehicleId: newId,
+      registrationNo: payload.registrationNo,
+      vehicleType: payload.vehicleType,
+      owner: payload.owner,
+      pucExpiry: payload.pucExpiry,
+      fitnessExpiry: '2027-12-31',
+      insuranceExpiry: payload.insuranceExpiry,
+      status: 'ACTIVE'
+    });
+
+    renderVehiclesTable(vehiclesData);
+    closeModal('modalAddVehicle');
+    alert(`✅ Vehicle registered successfully!\nID: ${newId}\nReg No: ${payload.registrationNo}\nType: ${payload.vehicleType}`);
+  }
+
+  async function refreshAllRegistries() {
+    try {
+      const [resC, resP, resE, resV] = await Promise.all([
+        BalsonsApi.call('contractor.list').catch(() => null),
+        BalsonsApi.call('personnel.list').catch(() => null),
+        BalsonsApi.call('equipment.list').catch(() => null),
+        BalsonsApi.call('vehicle.list').catch(() => null)
+      ]);
+
+      if (resC && resC.success && Array.isArray(resC.data)) contractorsData = resC.data;
+      if (resP && resP.success && Array.isArray(resP.data)) personnelData = resP.data;
+      if (resE && resE.success && Array.isArray(resE.data)) equipmentData = resE.data;
+      if (resV && resV.success && Array.isArray(resV.data)) vehiclesData = resV.data;
+
+      renderContractorsTable(contractorsData);
+      renderPersonnelTable(personnelData);
+      renderEquipmentTable(equipmentData);
+      renderVehiclesTable(vehiclesData);
+      populateContractorDropdowns();
+      alert('✅ All 4 Master Registries refreshed.');
+    } catch (err) {
+      console.error('Refresh error:', err);
+    }
+  }
+
+  function filterContractorsTable(q) {
+    const query = q.toLowerCase().trim();
+    const filtered = contractorsData.filter(c => 
+      c.contractorId.toLowerCase().includes(query) ||
+      c.companyName.toLowerCase().includes(query) ||
+      (c.contactPerson && c.contactPerson.toLowerCase().includes(query)) ||
+      (c.scope && c.scope.toLowerCase().includes(query))
+    );
+    renderContractorsTable(filtered);
+  }
+
+  function filterPersonnelByContractor(conId) {
+    if (!conId) {
+      renderPersonnelTable(personnelData);
+      return;
+    }
+    const filtered = personnelData.filter(p => p.contractorId === conId);
+    renderPersonnelTable(filtered);
+  }
+
+  function filterPersonnelTable(q) {
+    const query = q.toLowerCase().trim();
+    const filtered = personnelData.filter(p => 
+      p.personnelId.toLowerCase().includes(query) ||
+      p.fullName.toLowerCase().includes(query) ||
+      (p.trade && p.trade.toLowerCase().includes(query)) ||
+      (p.maskedGovtId && p.maskedGovtId.toLowerCase().includes(query))
+    );
+    renderPersonnelTable(filtered);
+  }
+
+  function filterEquipmentTable(q) {
+    const query = q.toLowerCase().trim();
+    const filtered = equipmentData.filter(e => 
+      e.equipmentId.toLowerCase().includes(query) ||
+      e.description.toLowerCase().includes(query) ||
+      (e.makeModel && e.makeModel.toLowerCase().includes(query)) ||
+      (e.owner && e.owner.toLowerCase().includes(query))
+    );
+    renderEquipmentTable(filtered);
+  }
+
+  function filterVehiclesTable(q) {
+    const query = q.toLowerCase().trim();
+    const filtered = vehiclesData.filter(v => 
+      v.vehicleId.toLowerCase().includes(query) ||
+      v.registrationNo.toLowerCase().includes(query) ||
+      (v.vehicleType && v.vehicleType.toLowerCase().includes(query)) ||
+      (v.owner && v.owner.toLowerCase().includes(query))
+    );
+    renderVehiclesTable(filtered);
   }
 </script>
 

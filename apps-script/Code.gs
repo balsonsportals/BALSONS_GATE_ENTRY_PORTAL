@@ -7,7 +7,7 @@
 const CONFIG = {
   PROJECT_ID: 'PRJ-JTRWF-SCHULER',
   SYSTEM_NAME: 'BALSONS JTRWF Gate Entry & Site Access Portal',
-  VERSION: '1.2.0-auth',
+  VERSION: '1.3.0-masterdata',
   ENV: 'staging',
   AUTH_HEADER_KEY: 'BALSONS_JTRWF_GATE_PHASE0_DEV_KEY',
   DEFAULT_SPREADSHEET_ID: '1yAuZOXc8WoC2TvTvnEWMrOyLl_50BRuJgDed_pdFT3o',
@@ -65,7 +65,6 @@ function doPost(e) {
   
   var session = null;
   if (PUBLIC_ACTIONS.indexOf(action) === -1) {
-    // Check if token is Phase 0 dev token or an active user session token
     if (authToken === CONFIG.AUTH_HEADER_KEY) {
       session = { userId: 'DEV_CLI', username: 'dev.cli', fullName: 'Phase 0 Test Harness', role: 'Owner' };
     } else {
@@ -127,26 +126,44 @@ function doPost(e) {
         break;
 
       case 'auth.validate_session':
-        responseData = {
-          valid: true,
-          user: session
-        };
+        responseData = { valid: true, user: session };
         break;
 
       case 'auth.logout':
         responseData = AuthService.logout(authToken);
         break;
 
-      case 'auth.seed_users':
-        if (session.role !== 'Owner') {
-          return createJsonResponse({
-            success: false,
-            status: 403,
-            error: { code: 'ACCESS_DENIED', message: 'Owner permission required.' }
-          });
-        }
-        AuthService.seedDefaultUsersIfEmpty();
-        responseData = { message: 'Default accounts seeded if empty.' };
+      // ─── MASTER DATA ROUTES (PHASE 3) ──────────────────────────────────
+      // Contractors
+      case 'contractor.list':
+        responseData = MasterDataService.listContractors();
+        break;
+      case 'contractor.add':
+        responseData = MasterDataService.addContractor(payload, session);
+        break;
+
+      // Personnel (JGE-007)
+      case 'personnel.list':
+        responseData = MasterDataService.listPersonnel(payload.contractorId);
+        break;
+      case 'personnel.add':
+        responseData = MasterDataService.addPersonnel(payload, session);
+        break;
+
+      // Equipment & Cranes
+      case 'equipment.list':
+        responseData = MasterDataService.listEquipment();
+        break;
+      case 'equipment.add':
+        responseData = MasterDataService.addEquipment(payload, session);
+        break;
+
+      // Vehicles & Drivers
+      case 'vehicle.list':
+        responseData = MasterDataService.listVehicles();
+        break;
+      case 'vehicle.add':
+        responseData = MasterDataService.addVehicle(payload, session);
         break;
 
       default:
