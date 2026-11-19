@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BALSONS JTRWF Gate Entry & Site Access Portal</title>
+  <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1Oviod2fa0MoZIhwfiMEc0tkMTeXcX_Ni" />
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #121926;
+      --card-hover: #1a2234;
+      --border: #222f46;
+      --border-focus: #3b82f6;
+      --text: #94a3b8;
+      --text-bright: #f8fafc;
+      --balsons-gold: #f59e0b;
+      --balsons-gold-dim: rgba(245, 158, 11, 0.15);
+      --success: #10b981;
+      --success-dim: rgba(16, 185, 129, 0.15);
+      --danger: #ef4444;
+      --danger-dim: rgba(239, 68, 68, 0.15);
+      --blue: #3b82f6;
+      --blue-dim: rgba(59, 130, 246, 0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Top Header */
+    header { background: #0b1120; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-logo { width: 38px; height: 38px; border-radius: 6px; background: var(--balsons-gold); display: flex; align-items: center; justify-content: center; font-weight: 900; color: #000; font-size: 18px; }
+    .brand-text h1 { font-size: 15px; font-weight: 700; color: var(--text-bright); letter-spacing: 0.5px; }
+    .brand-text p { font-size: 11px; color: var(--balsons-gold); font-weight: 600; text-transform: uppercase; }
+
+    .header-meta { display: flex; align-items: center; gap: 16px; }
+    .meta-tag { background: #162032; border: 1px solid var(--border); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #cbd5e1; }
+    .user-pill { display: flex; align-items: center; gap: 10px; background: #162032; border: 1px solid var(--border); padding: 5px 12px; border-radius: 999px; font-size: 12px; }
+    .user-role-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .role-Owner { background: var(--balsons-gold-dim); color: var(--balsons-gold); border: 1px solid var(--balsons-gold); }
+    .role-SafetyManager { background: var(--success-dim); color: var(--success); border: 1px solid var(--success); }
+    .role-SafetyTeam { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue); }
+    
+    .btn { background: var(--blue); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.15s ease; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { opacity: 0.9; }
+    .btn-gold { background: var(--balsons-gold); color: #000; font-weight: 700; }
+    .btn-danger { background: var(--danger); }
+    .btn-secondary { background: #1e293b; border: 1px solid var(--border); color: #cbd5e1; }
+    .btn-sm { padding: 5px 10px; font-size: 11px; }
+
+    /* Navigation Bar */
+    nav { background: #0f172a; border-bottom: 1px solid var(--border); display: flex; padding: 0 24px; gap: 4px; overflow-x: auto; }
+    nav button { background: transparent; border: none; color: #94a3b8; padding: 12px 16px; font-size: 13px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: 0.15s; white-space: nowrap; }
+    nav button:hover { color: var(--text-bright); }
+    nav button.active { color: var(--balsons-gold); border-bottom-color: var(--balsons-gold); }
+
+    /* Content Area */
+    main { padding: 24px; max-width: 1400px; width: 100%; margin: 0 auto; flex: 1; }
+    .section-view { display: none; }
+    .section-view.active { display: block; }
+
+    /* Stat Cards (Command Radar) */
+    .radar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px; position: relative; overflow: hidden; }
+    .stat-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--border); }
+    .stat-card.gold::before { background: var(--balsons-gold); }
+    .stat-card.green::before { background: var(--success); }
+    .stat-card.blue::before { background: var(--blue); }
+    .stat-card.red::before { background: var(--danger); }
+    .stat-label { font-size: 11px; text-transform: uppercase; font-weight: 700; color: #64748b; letter-spacing: 0.5px; }
+    .stat-val { font-size: 28px; font-weight: 800; color: var(--text-bright); margin: 6px 0; }
+    .stat-sub { font-size: 11px; color: #94a3b8; }
+
+    /* Tables */
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+    .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .card-head h2 { font-size: 16px; color: var(--text-bright); }
+    
+    table.data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    table.data-table th, table.data-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    table.data-table th { background: #0c1322; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+    table.data-table tr:hover td { background: var(--card-hover); }
+
+    /* Status Pills */
+    .pill { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .pill-cleared { background: var(--success-dim); color: var(--success); border: 1px solid var(--success); }
+    .pill-conditional { background: var(--balsons-gold-dim); color: var(--balsons-gold); border: 1px solid var(--balsons-gold); }
+    .pill-blocked { background: var(--danger-dim); color: var(--danger); border: 1px solid var(--danger); }
+
+    /* Login Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .login-box { background: #111827; border: 1px solid #374151; border-radius: 12px; width: 100%; max-width: 420px; padding: 32px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); }
+    .login-box h2 { color: var(--text-bright); font-size: 20px; margin-bottom: 6px; }
+    .login-box p { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px; }
+    .form-group input { width: 100%; background: #030712; border: 1px solid #374151; border-radius: 6px; padding: 10px 14px; color: #fff; font-size: 14px; }
+    .form-group input:focus { outline: none; border-color: var(--blue); }
+    .quick-users { margin-top: 20px; padding-top: 16px; border-top: 1px solid #374151; }
+    .quick-users p { font-size: 11px; color: #9ca3af; margin-bottom: 8px; }
+    .quick-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      header { flex-direction: column; gap: 12px; align-items: flex-start; }
+      .header-meta { width: 100%; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login Modal -->
+<div id="loginModal" class="modal-backdrop">
+  <div class="login-box">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+      <div class="brand-logo" style="width: 32px; height: 32px; font-size: 15px;">B</div>
+      <h2 style="margin: 0;">Portal Sign-In</h2>
+    </div>
+    <p>BALSONS Gate Entry & Site Access System • JTRWF</p>
+
+    <div id="loginError" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 16px;"></div>
+
+    <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="loginUsername" required placeholder="admin | safety.manager | safety.team">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" required placeholder="••••••••••••">
+      </div>
+      <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 11px; margin-top: 8px;">
+        Authorize & Sign In
+      </button>
+    </form>
+
+    <div class="quick-users">
+      <p>Quick Autofill for Testing:</p>
+      <div class="quick-btns">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('admin', 'Balsons@2026!')">👑 Owner</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('safety.manager', 'Safety@2026!')">🛡️ Safety Mgr</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('safety.team', 'Team@2026!')">👷 Safety Team</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Application Interface -->
+<header>
+  <div class="brand">
+    <div class="brand-logo">B</div>
+    <div class="brand-text">
+      <h1>BALSONS HEAVY LIFT & SHIFT</h1>
+      <p>JTRWF Gate Entry & Site Access Portal</p>
+    </div>
+  </div>
+
+  <div class="header-meta">
+    <span class="meta-tag">JTRWF • Schuler Project</span>
+    <div class="user-pill">
+      <span id="navUserName">Authenticating...</span>
+      <span id="navUserRole" class="user-role-badge">Guest</span>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="BalsonsAuth.logout()">Log Out</button>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="switchTab('radar')">🧭 Command Radar & Muster</button>
+  <button onclick="switchTab('inward')">🚚 Material Inward (PO / DC)</button>
+  <button onclick="switchTab('gatepass')">📄 Gate Pass Center (RGP / NRGP)</button>
+  <button onclick="switchTab('personnel')">🦺 Personnel Compliance</button>
+  <button onclick="switchTab('audit')">📋 Audit Trail</button>
+</nav>
+
+<main>
+  <!-- TAB 1: COMMAND RADAR & MUSTER -->
+  <section id="tab-radar" class="section-view active">
+    <div class="radar-grid">
+      <div class="stat-card green">
+        <div class="stat-label">Active Headcount Inside Site</div>
+        <div class="stat-val" id="radarTotalInside">48</div>
+        <div class="stat-sub">34 Balsons Staff • 14 Subcontractor</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Vehicles in Unloading Bays</div>
+        <div class="stat-val" id="radarActiveVehicles">5</div>
+        <div class="stat-sub">2 Hydraulic Pullers • 3 Trailers</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-label">Deliveries Logged Today</div>
+        <div class="stat-val" id="radarInwardToday">12</div>
+        <div class="stat-sub">9 Handed Over to Store • 3 Pending</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-label">Overdue Returnables (RGP)</div>
+        <div class="stat-val" id="radarOverdueRgp">1</div>
+        <div class="stat-sub">100T Jack Calibration overdue by 2 days</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>🚨 Live Emergency Evacuation Roll Call (Site Muster)</h2>
+        <button class="btn btn-danger btn-sm" onclick="window.print()">🖨️ Print Emergency Muster</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Entry ID</th>
+            <th>Personnel / Contractor</th>
+            <th>Trade / Role</th>
+            <th>Assigned Bay</th>
+            <th>Gate In Time</th>
+            <th>Safety Induction</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>PER-2026-0012</strong></td>
+            <td>Ramesh Kumar (Balsons)</td>
+            <td>Rigger Lead</td>
+            <td>Main Press Pit</td>
+            <td>08:15 AM</td>
+            <td><span class="pill pill-cleared">Verified</span></td>
+            <td><span class="pill pill-cleared">Inside</span></td>
+          </tr>
+          <tr>
+            <td><strong>PER-2026-0044</strong></td>
+            <td>Sunil Swain (Ferroterro)</td>
+            <td>Hydraulic Technician</td>
+            <td>Billet Preparation Bay</td>
+            <td>08:32 AM</td>
+            <td><span class="pill pill-cleared">Verified</span></td>
+            <td><span class="pill pill-cleared">Inside</span></td>
+          </tr>
+          <tr>
+            <td><strong>PER-2026-0089</strong></td>
+            <td>Ajay Verma (Contractor Gang)</td>
+            <td>Fitter</td>
+            <td>Circular Saw Line</td>
+            <td>09:05 AM</td>
+            <td><span class="pill pill-conditional">Conditional</span></td>
+            <td><span class="pill pill-cleared">Inside</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TAB 2: MATERIAL INWARD -->
+  <section id="tab-inward" class="section-view">
+    <div class="card">
+      <div class="card-head">
+        <h2>🚚 Material Inward Gate Entry (IGE)</h2>
+        <span class="meta-tag">Auto-notifies Store Manager</span>
+      </div>
+      <p style="font-size: 13px; margin-bottom: 20px;">Record incoming shipments, delivery challans, and trigger physical handoff to Store Manager.</p>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label>Purchase Order (PO) Number</label>
+          <input type="text" placeholder="e.g. PO-JTRWF-2026-041">
+        </div>
+        <div class="form-group">
+          <label>Delivery Challan / Invoice No.</label>
+          <input type="text" placeholder="e.g. DC-78945 / INV-2026-11">
+        </div>
+        <div class="form-group">
+          <label>Vendor / Supplier Name</label>
+          <input type="text" placeholder="e.g. Schuler AG / Stanley / Ferroterro">
+        </div>
+        <div class="form-group">
+          <label>Transporter & Vehicle Number</label>
+          <input type="text" placeholder="e.g. VRL Logistics • OD-02-AK-9811">
+        </div>
+      </div>
+      <button class="btn btn-gold" style="margin-top: 10px;" onclick="alert('Inward logged successfully. Notification sent to Store Manager.')">
+        Generate Inward Token (IGE-2026-XXXX)
+      </button>
+    </div>
+  </section>
+
+  <!-- TAB 3: GATE PASS CENTER -->
+  <section id="tab-gatepass" class="section-view">
+    <div class="card">
+      <div class="card-head">
+        <h2>📄 Controlled Gate Pass Center (RGP / NRGP)</h2>
+        <button class="btn btn-gold btn-sm" onclick="alert('Opening Gate Pass Creator...')">+ New Gate Pass</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Pass No</th>
+            <th>Type</th>
+            <th>Item Description</th>
+            <th>Qty</th>
+            <th>Sent To</th>
+            <th>Expected Return</th>
+            <th>Approval</th>
+            <th>Gate Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>RGP-2026-0004</strong></td>
+            <td><span class="pill pill-conditional">RGP</span></td>
+            <td>100T Hydraulic Jack (Testing)</td>
+            <td>2 Nos</td>
+            <td>Precision Calibrators Kolkata</td>
+            <td>2026-11-25</td>
+            <td><span class="pill pill-cleared">Approved (Store Lead)</span></td>
+            <td><span class="pill pill-cleared">Exited Gate 1</span></td>
+          </tr>
+          <tr>
+            <td><strong>NRGP-2026-0019</strong></td>
+            <td><span class="pill pill-cleared">NRGP</span></td>
+            <td>Empty Hydraulic Oil Drums (Scrap)</td>
+            <td>18 Drums</td>
+            <td>Authorized Scrap Recycler</td>
+            <td>N/A</td>
+            <td><span class="pill pill-cleared">Approved (PM)</span></td>
+            <td><span class="pill pill-cleared">Cleared</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TAB 4: PERSONNEL COMPLIANCE -->
+  <section id="tab-personnel" class="section-view">
+    <div class="card">
+      <div class="card-head">
+        <h2>🦺 9-Discipline Personnel & Safety Clearance</h2>
+        <span class="meta-tag">JTRWF Mandatory Safety Filters</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Personnel ID</th>
+            <th>Full Name</th>
+            <th>Contractor</th>
+            <th>Police Verif</th>
+            <th>Medical & Vertigo</th>
+            <th>Workmen Comp</th>
+            <th>Decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>PER-2026-0001</strong></td>
+            <td>Amitabh Roy</td>
+            <td>BALSONS</td>
+            <td>Valid (2027)</td>
+            <td>Cleared (Height OK)</td>
+            <td>Active</td>
+            <td><span class="pill pill-cleared">CLEARED</span></td>
+          </tr>
+          <tr>
+            <td><strong>PER-2026-0042</strong></td>
+            <td>Bikash Jena</td>
+            <td>Odisha Heavy Riggers</td>
+            <td>Valid (2027)</td>
+            <td><span style="color: #ef4444; font-weight: bold;">Vertigo Missing</span></td>
+            <td>Active</td>
+            <td><span class="pill pill-blocked">BLOCKED (Height)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TAB 5: AUDIT TRAIL -->
+  <section id="tab-audit" class="section-view">
+    <div class="card">
+      <div class="card-head">
+        <h2>📋 Immutable System Audit Ledger (AUDIT_LOG)</h2>
+        <span class="meta-tag">Live Google Sheets Feed</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Audit ID</th>
+            <th>Timestamp</th>
+            <th>Actor</th>
+            <th>Role</th>
+            <th>Action</th>
+            <th>Outcome</th>
+          </tr>
+        </thead>
+        <tbody id="auditTableBody">
+          <tr>
+            <td>AUD-2026-E8A1</td>
+            <td>2026-11-19 11:45:20</td>
+            <td>admin</td>
+            <td>Owner</td>
+            <td>SYSTEM_INIT</td>
+            <td><span class="pill pill-cleared">SUCCESS</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api-client.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+  function switchTab(tabName) {
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('tab-' + tabName).classList.add('active');
+  }
+
+  function quickFill(user, pass) {
+    document.getElementById('loginUsername').value = user;
+    document.getElementById('loginPassword').value = pass;
+  }
+
+  async function handleLoginSubmit(e) {
+    e.preventDefault();
+    const u = document.getElementById('loginUsername').value.trim();
+    const p = document.getElementById('loginPassword').value.trim();
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+
+    const res = await BalsonsAuth.login(u, p);
+    if (res.success) {
+      document.getElementById('loginModal').style.display = 'none';
+      renderUserSession(res.user);
+    } else {
+      errEl.textContent = res.message;
+      errEl.style.display = 'block';
+    }
+  }
+
+  function renderUserSession(user) {
+    document.getElementById('navUserName').textContent = user.fullName || user.username;
+    const roleEl = document.getElementById('navUserRole');
+    roleEl.textContent = user.role;
+    roleEl.className = 'user-role-badge role-' + (user.role || '').replace(/\s+/g, '');
+  }
+
+  // Auto-check session on load
+  window.addEventListener('DOMContentLoaded', () => {
+    if (BalsonsAuth.isLoggedIn()) {
+      document.getElementById('loginModal').style.display = 'none';
+      renderUserSession(BalsonsAuth.getUser());
+    } else {
+      document.getElementById('loginModal').style.display = 'flex';
+    }
+  });
+</script>
+
+</body>
+</html>

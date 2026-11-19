@@ -1,13 +1,13 @@
 /**
  * BALSONS JTRWF GATE ENTRY & SITE ACCESS PORTAL
- * Apps Script Backend API — Phase 0 & Master Router
- * Platform Architecture: BALSONS-SAM-2026
+ * Apps Script Backend API — Master Dispatcher
+ * Architecture: BALSONS-SAM-2026 (Locked)
  */
 
 const CONFIG = {
   PROJECT_ID: 'PRJ-JTRWF-SCHULER',
   SYSTEM_NAME: 'BALSONS JTRWF Gate Entry & Site Access Portal',
-  VERSION: '1.1.0-phase0',
+  VERSION: '1.2.0-auth',
   ENV: 'staging',
   AUTH_HEADER_KEY: 'BALSONS_JTRWF_GATE_PHASE0_DEV_KEY',
   DEFAULT_SPREADSHEET_ID: '1yAuZOXc8WoC2TvTvnEWMrOyLl_50BRuJgDed_pdFT3o',
@@ -18,7 +18,7 @@ const CONFIG = {
 };
 
 /**
- * Handle HTTP GET Requests (Public Health Check & Ping)
+ * Handle HTTP GET Requests (Public Health Check & Gateway Info)
  */
 function doGet(e) {
   var action = (e && e.parameter && e.parameter.action) ? e.parameter.action : 'health';
@@ -58,16 +58,28 @@ function doPost(e) {
   var action = request.action || 'system.ping';
   var requestId = request.requestId || 'req_' + startTime;
   var authToken = request.authToken || '';
+  var payload = request.payload || {};
 
-  // Phase 0 Auth Check: All POST actions require valid authentication token
-  if (action !== 'system.public_ping' && authToken !== CONFIG.AUTH_HEADER_KEY) {
-    return createJsonResponse({
-      success: false,
-      status: 401,
-      requestId: requestId,
-      action: action,
-      error: { code: 'AUTH_REQUIRED', message: 'Unauthorized: Invalid or missing authentication token.' }
-    });
+  // Public Actions (No Auth Required)
+  var PUBLIC_ACTIONS = ['system.public_ping', 'system.ping', 'auth.login'];
+  
+  var session = null;
+  if (PUBLIC_ACTIONS.indexOf(action) === -1) {
+    // Check if token is Phase 0 dev token or an active user session token
+    if (authToken === CONFIG.AUTH_HEADER_KEY) {
+      session = { userId: 'DEV_CLI', username: 'dev.cli', fullName: 'Phase 0 Test Harness', role: 'Owner' };
+    } else {
+      session = AuthService.validateSession(authToken);
+      if (!session) {
+        return createJsonResponse({
+          success: false,
+          status: 401,
+          requestId: requestId,
+          action: action,
+          error: { code: 'AUTH_REQUIRED', message: 'Session expired or unauthorized. Please log in.' }
+        });
+      }
+    }
   }
 
   // Action Dispatcher
@@ -77,8 +89,7 @@ function doPost(e) {
       case 'system.public_ping':
       case 'system.ping':
         responseData = {
-          message: 'Phase 0 Transport Handshake Verified.',
-          authenticated: (authToken === CONFIG.AUTH_HEADER_KEY),
+          message: 'Transport Handshake Active.',
           clientTimestamp: request.timestamp || null,
           transportProtocol: 'POST / text/plain (CORS preflight-safe)',
           environment: CONFIG.ENV
@@ -88,8 +99,8 @@ function doPost(e) {
       case 'system.db_probe':
         var ssId = CONFIG.getSpreadsheetId();
         var sheetCount = 0;
-        var statusMsg = 'Database not linked.';
         var sheetNames = [];
+        var statusMsg = 'Database not linked.';
         if (ssId) {
           try {
             var ss = SpreadsheetApp.openById(ssId);
@@ -110,12 +121,32 @@ function doPost(e) {
         };
         break;
 
-      case 'system.auto_provision':
-        var initResult = runInit();
+      // ─── AUTHENTICATION ROUTES ──────────────────────────────────────────
+      case 'auth.login':
+        responseData = AuthService.login(payload.username, payload.password);
+        break;
+
+      case 'auth.validate_session':
         responseData = {
-          provisionResult: initResult,
-          spreadsheetId: CONFIG.getSpreadsheetId()
+          valid: true,
+          user: session
         };
+        break;
+
+      case 'auth.logout':
+        responseData = AuthService.logout(authToken);
+        break;
+
+      case 'auth.seed_users':
+        if (session.role !== 'Owner') {
+          return createJsonResponse({
+            success: false,
+            status: 403,
+            error: { code: 'ACCESS_DENIED', message: 'Owner permission required.' }
+          });
+        }
+        AuthService.seedDefaultUsersIfEmpty();
+        responseData = { message: 'Default accounts seeded if empty.' };
         break;
 
       default:
