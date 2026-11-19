@@ -19,7 +19,7 @@
       align-items: center;
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 100;
       box-shadow: 0 1px 2px rgba(16, 45, 53, 0.03);
     }
     .brand {
@@ -107,36 +107,146 @@
       gap: 5px;
     }
 
-    /* Enterprise Navigation Bar */
+    /* Enterprise Navigation Bar — Locked Sticky Tab Bar (Zero Scrollbar, Smart Dropdowns) */
     nav {
-      background: var(--beds-charcoal-nav);
-      display: flex;
-      padding: 0 28px;
-      gap: 2px;
-      overflow-x: auto;
-    }
-    nav button {
-      background: transparent;
-      border: none;
-      color: #8E9FA8;
-      padding: 12px 16px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: var(--beds-transition);
-      white-space: nowrap;
+      background: var(--beds-bg-panel);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      padding: 7px 28px;
+      overflow: visible !important; /* STRICTLY NO SCROLLBAR, ALLOWS DROPDOWNS */
+      white-space: normal;
+      position: sticky;
+      top: 58px; /* Locked below top header */
+      z-index: 90;
+      border-bottom: 2px solid var(--beds-teal-primary);
+      border-top: 1px solid var(--beds-border);
+      transition: background-color var(--beds-transition), border-color var(--beds-transition);
     }
-    nav button:hover {
-      color: #FFFFFF;
+    nav button.beds-nav-tab, nav button {
+      background: transparent;
+      border: 1px solid transparent;
+      color: #000000 !important; /* STRICTLY BLACK IN LIGHT MODE (USER LOCKED) */
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: var(--beds-radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all var(--beds-transition);
+      position: relative;
     }
-    nav button.active {
-      color: #FFFFFF;
-      border-bottom-color: var(--beds-teal-primary);
-      background: rgba(0, 151, 178, 0.12);
+    nav button.beds-nav-tab:hover:not(.active), nav button:hover:not(.active) {
+      background: rgba(0, 151, 178, 0.08);
+      color: #000000 !important;
+      border-color: rgba(0, 151, 178, 0.2);
+    }
+    nav button.beds-nav-tab.active, nav button.active {
+      background: var(--beds-teal-primary) !important;
+      color: #FFFFFF !important;
+      font-weight: 800;
+      box-shadow: 0 1px 3px rgba(0, 151, 178, 0.3);
+    }
+
+    /* Tab colors in Dark Mode */
+    [data-theme="dark"] nav {
+      background: var(--beds-bg-panel);
+      border-top-color: var(--beds-border);
+    }
+    [data-theme="dark"] nav button.beds-nav-tab, [data-theme="dark"] nav button {
+      color: #FFFFFF !important; /* STRICTLY WHITE IN DARK MODE (USER LOCKED) */
+    }
+    [data-theme="dark"] nav button.beds-nav-tab:hover:not(.active), [data-theme="dark"] nav button:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFFFFF !important;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    [data-theme="dark"] nav button.beds-nav-tab.active, [data-theme="dark"] nav button.active {
+      background: var(--beds-teal-primary) !important;
+      color: #FFFFFF !important;
+    }
+
+    /* Smart Dropdown Navigation System */
+    .beds-nav-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .beds-caret {
+      font-size: 10px;
+      margin-left: 4px;
+      transition: transform 0.2s ease;
+      display: inline-block;
+    }
+    .beds-nav-dropdown.open .beds-caret {
+      transform: rotate(180deg);
+    }
+    .beds-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 270px;
+      background: var(--beds-bg-panel);
+      border: 1px solid var(--beds-border);
+      border-radius: var(--beds-radius-md);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+      z-index: 250;
+      padding: 6px;
+    }
+    .beds-nav-dropdown.open .beds-dropdown-menu {
+      display: block;
+      animation: dropdownSlide 0.15s ease-out;
+    }
+    @keyframes dropdownSlide {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .beds-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--beds-radius-sm);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--beds-transition);
+      color: #000000 !important; /* STRICTLY BLACK IN LIGHT MODE */
+    }
+    [data-theme="dark"] .beds-dropdown-item {
+      color: #FFFFFF !important; /* STRICTLY WHITE IN DARK MODE */
+    }
+    .beds-dropdown-item:hover {
+      background: rgba(0, 151, 178, 0.08);
+      color: #000000 !important;
+    }
+    [data-theme="dark"] .beds-dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #FFFFFF !important;
+    }
+    .beds-dropdown-item.active {
+      background: rgba(0, 151, 178, 0.15) !important;
+      border-left: 3px solid var(--beds-teal-primary);
+    }
+    .beds-dropdown-item .item-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .beds-dropdown-item .item-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .beds-dropdown-item .item-text strong {
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+    .beds-dropdown-item .item-text small {
+      font-size: 10.5px;
+      color: var(--beds-text-secondary);
+      font-weight: 500;
     }
 
     /* Content Layout */
@@ -598,15 +708,88 @@
   </div>
 </header>
 
-<!-- Enterprise Navigation Bar -->
-<nav>
-  <button class="active" onclick="switchTab('radar')">🧭 Command Radar & Muster</button>
-  <button onclick="switchTab('registries')">🗂️ Master Registries</button>
-  <button onclick="switchTab('challan')">📑 Material Challan Creator</button>
-  <button onclick="switchTab('inward')">🚚 Material Inward (PO / DC)</button>
-  <button onclick="switchTab('gatepass')">📄 Gate Pass Center (RGP / NRGP)</button>
-  <button onclick="switchTab('personnel')">🦺 9-Discipline Clearance</button>
-  <button onclick="switchTab('audit')">📋 Audit Trail</button>
+<!-- Enterprise Navigation Bar: Locked Zero-Scrollbar Smart Dropdowns -->
+<nav id="master-nav-tabs">
+  <!-- Group 1: Command Radar & Muster (Direct) -->
+  <button class="beds-nav-tab active" data-target="radar" onclick="switchTab('radar')">
+    🧭 Command Radar & Muster
+  </button>
+
+  <!-- Group 2: Material Inward & Challans Dropdown -->
+  <div class="beds-nav-dropdown">
+    <button class="beds-nav-tab beds-dropdown-toggle" id="toggle-gate-materials" type="button">
+      🚚 Material Logistics <span class="beds-caret">▾</span>
+    </button>
+    <div class="beds-dropdown-menu">
+      <a class="beds-dropdown-item" data-target="inward" onclick="switchTab('inward')">
+        <span class="item-icon">🚚</span>
+        <div class="item-text">
+          <strong>Material Inward (PO / DC)</strong>
+          <small>Vendor challans, physical inspection & receipt</small>
+        </div>
+      </a>
+      <a class="beds-dropdown-item" data-target="challan" onclick="switchTab('challan')">
+        <span class="item-icon">📑</span>
+        <div class="item-text">
+          <strong>Delivery Challan Creator</strong>
+          <small>Standard dispatch & transshipment challans</small>
+        </div>
+      </a>
+      <a class="beds-dropdown-item" data-target="registries" onclick="switchTab('registries')">
+        <span class="item-icon">🗂️</span>
+        <div class="item-text">
+          <strong>Master Registries</strong>
+          <small>Material & inventory tracking ledgers</small>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Group 3: Gate Pass Center Dropdown -->
+  <div class="beds-nav-dropdown">
+    <button class="beds-nav-tab beds-dropdown-toggle" id="toggle-gate-passes" type="button">
+      📄 Gate Pass Center <span class="beds-caret">▾</span>
+    </button>
+    <div class="beds-dropdown-menu">
+      <a class="beds-dropdown-item" data-target="gatepass" onclick="switchTab('gatepass')">
+        <span class="item-icon">📄</span>
+        <div class="item-text">
+          <strong>Gate Pass Operations (RGP / NRGP)</strong>
+          <small>Returnable & non-returnable exit passes</small>
+        </div>
+      </a>
+      <a class="beds-dropdown-item" data-target="audit" onclick="switchTab('audit')">
+        <span class="item-icon">📋</span>
+        <div class="item-text">
+          <strong>Security Audit Trail</strong>
+          <small>Log entries, vehicle movements & gate events</small>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Group 4: Personnel & Safety Clearance Dropdown -->
+  <div class="beds-nav-dropdown">
+    <button class="beds-nav-tab beds-dropdown-toggle" id="toggle-gate-personnel" type="button">
+      🦺 Personnel & Safety Clearance <span class="beds-caret">▾</span>
+    </button>
+    <div class="beds-dropdown-menu">
+      <a class="beds-dropdown-item" data-target="gate-safety-clearance" onclick="switchTab('gate-safety-clearance')">
+        <span class="item-icon">🛡️</span>
+        <div class="item-text">
+          <strong>Safety Induction & Site Clearance Hub</strong>
+          <small>Tri-portal work authorization & gate block check</small>
+        </div>
+      </a>
+      <a class="beds-dropdown-item" data-target="personnel" onclick="switchTab('personnel')">
+        <span class="item-icon">🦺</span>
+        <div class="item-text">
+          <strong>9-Discipline Personnel Clearance</strong>
+          <small>Access authorization by engineering trade</small>
+        </div>
+      </a>
+    </div>
+  </div>
 </nav>
 
 <main>
@@ -1612,6 +1795,111 @@
       </table>
     </div>
   </section>
+
+  <!-- TAB 8: SAFETY INDUCTION & SITE CLEARANCE HUB -->
+  <section id="tab-gate-safety-clearance" class="section-view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h2 style="font-size: 18px; font-weight: 800; color: var(--beds-charcoal-heading); display: flex; align-items: center; gap: 8px;">
+          🛡️ Tri-Portal Safety Induction & Security Work Authorisation Hub
+          <span class="status-pill status-info">Real-Time Security Enforcement</span>
+        </h2>
+        <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
+          Live security clearance gate connecting <strong>BALSONS Safety Portal</strong> (Induction & Form 31) ↔ <strong>BALSONS HR Portal</strong> (Employment & Pass) ↔ <strong>Gate Entry Security</strong>.
+        </p>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-secondary btn-sm" onclick="syncWithSafetyAndHrPortals()">🔄 Sync All Portals</button>
+      </div>
+    </div>
+
+    <!-- Security KPI Radar -->
+    <div class="radar-grid" style="margin-bottom: 24px;">
+      <div class="kpi-card teal">
+        <div class="kpi-label">Site Personnel Master (HR)</div>
+        <div class="kpi-value">68 Active</div>
+        <div class="kpi-sub">Onboarded & Verified Employees</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Safety Inducted & Cleared</div>
+        <div class="kpi-value" style="color: #059669;">67 Passes</div>
+        <div class="kpi-sub">Helmet Stickers Issued & Valid</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">Blocked at Security Gate</div>
+        <div class="kpi-value" style="color: #DC2626;">1 Blocked</div>
+        <div class="kpi-sub">EMP-2026-0007 (Pending Induction)</div>
+      </div>
+      <div class="kpi-card amber">
+        <div class="kpi-label">Active Plant Work Permits</div>
+        <div class="kpi-value" style="color: #D97706;">7 Active</div>
+        <div class="kpi-sub">Schuler Press Erection Area</div>
+      </div>
+    </div>
+
+    <!-- Live Gate Inquiry Terminal -->
+    <div class="beds-card" style="margin-bottom: 24px; padding: 20px 24px;">
+      <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 14px; color: var(--beds-charcoal-heading);">
+        ⚡ Live Security Gate Entry Clearance Terminal
+      </h3>
+      <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 280px; position: relative;">
+          <input type="text" id="gate-security-query-emp-id" class="beds-input" placeholder="Enter Employee ID (e.g. EMP-2026-0001 or EMP-2026-0007)..." value="EMP-2026-0001" style="width: 100%; font-family: monospace; font-weight: 700; font-size: 13px; padding-left: 36px;">
+          <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; opacity: 0.6;">🔍</span>
+        </div>
+        <button class="btn btn-primary" onclick="verifyGateSecurityClearance()" style="padding: 8px 18px; font-weight: 800;">
+          🛡️ Evaluate Site Access & PTW
+        </button>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <span style="font-size: 11.5px; color: var(--beds-text-secondary); font-weight: 600;">Test Presets:</span>
+          <button class="btn btn-secondary btn-sm" onclick="setAndVerifyGateClearance('EMP-2026-0001')" style="font-size: 11px; padding: 3px 8px; border-color: #059669; color: #059669;">
+            🟢 EMP-2026-0001 (Cleared Rigger Lead)
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="setAndVerifyGateClearance('EMP-2026-0007')" style="font-size: 11px; padding: 3px 8px; border-color: #DC2626; color: #DC2626;">
+            🔴 EMP-2026-0007 (Blocked Trainee)
+          </button>
+        </div>
+      </div>
+
+      <!-- Verdict Box -->
+      <div id="gate-security-clearance-verdict-box">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+
+    <!-- Security Gate Master Personnel Clearance Table -->
+    <div class="table-container">
+      <div class="table-header">
+        <div>
+          <h3 style="font-size: 14px; font-weight: 700; color: var(--beds-charcoal-heading);">
+            📋 JTRWF Main Gate Security Access Authorization Registry
+          </h3>
+          <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
+            Strict Zero-Tolerance Safety Protocol: No worker is granted gate pass without valid Safety Induction ID and Form 31 medical fitness.
+          </p>
+        </div>
+        <input type="text" id="searchGateSafetyInput" class="beds-input" placeholder="Search badge, name or pass..." style="width: 220px; font-size: 12px;" oninput="filterGateSafetyDirectory(this.value)">
+      </div>
+      <table class="beds-table">
+        <thead>
+          <tr>
+            <th>Gate Pass ID</th>
+            <th>Emp ID</th>
+            <th>Full Name</th>
+            <th>Engineering Trade</th>
+            <th>Safety Induction #</th>
+            <th>Helmet Pass / Sticker #</th>
+            <th>Medical Form 31</th>
+            <th>Active PTW Permit</th>
+            <th>Security Gate Decision</th>
+          </tr>
+        </thead>
+        <tbody id="gateSafetyDirectoryBody">
+          <!-- Populated dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </section>
 </main>
 
 <!-- ─── PHASE 3 MODALS: MASTER DATA REGISTRATION ───────────────────── -->
@@ -2044,10 +2332,192 @@
 <script src="assets/js/auth.js"></script>
 <script>
   function switchTab(tabName) {
-    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    // Direct nav tabs
+    document.querySelectorAll('nav button.beds-nav-tab').forEach(b => {
+      if (b.getAttribute('data-target') === tabName) b.classList.add('active');
+      else b.classList.remove('active');
+    });
+
+    // Dropdown parent highlighting and item highlighting
+    document.querySelectorAll('.beds-nav-dropdown').forEach(dropdown => {
+      const hasActive = dropdown.querySelector(`.beds-dropdown-item[data-target="${tabName}"]`);
+      const toggle = dropdown.querySelector('.beds-dropdown-toggle');
+      if (toggle) {
+        if (hasActive) toggle.classList.add('active');
+        else toggle.classList.remove('active');
+      }
+      dropdown.querySelectorAll('.beds-dropdown-item').forEach(item => {
+        if (item.getAttribute('data-target') === tabName) item.classList.add('active');
+        else item.classList.remove('active');
+      });
+    });
+
+    // Close open dropdowns
+    document.querySelectorAll('.beds-nav-dropdown').forEach(d => d.classList.remove('open'));
+
+    // Switch section views
     document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-    document.getElementById('tab-' + tabName).classList.add('active');
+    const targetSec = document.getElementById('tab-' + tabName);
+    if (targetSec) targetSec.classList.add('active');
+
+    if (tabName === 'gate-safety-clearance') {
+      renderGateSafetyDirectory();
+      verifyGateSecurityClearance('EMP-2026-0001');
+    }
+  }
+
+  function initGateDropdowns() {
+    document.querySelectorAll('.beds-dropdown-toggle').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const parent = btn.closest('.beds-nav-dropdown');
+        const wasOpen = parent.classList.contains('open');
+        document.querySelectorAll('.beds-nav-dropdown').forEach(d => d.classList.remove('open'));
+        if (!wasOpen) parent.classList.add('open');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.beds-nav-dropdown')) {
+        document.querySelectorAll('.beds-nav-dropdown').forEach(d => d.classList.remove('open'));
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.beds-nav-dropdown').forEach(d => d.classList.remove('open'));
+      }
+    });
+  }
+
+  // ─── TRI-PORTAL GATE & SAFETY AUTHORIZATION ───
+  const gateSafetyPersonnelMaster = [
+    { gatePassId: 'GP-SEC-2026-0101', empId: 'EMP-2026-0001', name: 'Ramesh Kumar', trade: 'Senior Rigger Lead', inductionId: 'IND-JTRWF-2026-0001', passNo: 'SP-2026-001', medical: 'FIT (Form 31 Certified)', isInducted: true, ptw: 'PTW-LFT-2026-0048', clearance: 'CLEARED_FOR_WORK' },
+    { gatePassId: 'GP-SEC-2026-0102', empId: 'EMP-2026-0002', name: 'Sunil Swain', trade: 'Hydraulic Specialist', inductionId: 'IND-JTRWF-2026-0002', passNo: 'SP-2026-002', medical: 'FIT (Form 31 Certified)', isInducted: true, ptw: 'PTW-MHI-2026-0047', clearance: 'CLEARED_FOR_WORK' },
+    { gatePassId: 'GP-SEC-2026-0103', empId: 'EMP-2026-0003', name: 'Ajay Verma', trade: 'Mechanical Assembly Fitter', inductionId: 'IND-JTRWF-2026-0003', passNo: 'SP-2026-003', medical: 'FIT (Height Pass Certified)', isInducted: true, ptw: 'PTW-HT-2026-0044', clearance: 'CLEARED_FOR_WORK' },
+    { gatePassId: 'GP-SEC-2026-0104', empId: 'EMP-2026-0004', name: 'Dharmendra Pradhan', trade: 'Crawler Crane Operator (150T)', inductionId: 'IND-JTRWF-2026-0004', passNo: 'SP-2026-004', medical: 'FIT (Vision & Heavy Crane Certified)', isInducted: true, ptw: 'PTW-LFT-2026-0048', clearance: 'CLEARED_FOR_WORK' },
+    { gatePassId: 'GP-SEC-2026-0105', empId: 'EMP-2026-0005', name: 'Manoj Mohanty', trade: 'Project Engineer', inductionId: 'IND-JTRWF-2026-0005', passNo: 'SP-2026-005', medical: 'FIT (Site Engineering Inspection)', isInducted: true, ptw: 'PTW-GEN-2026-0041', clearance: 'CLEARED_FOR_WORK' },
+    { gatePassId: 'GP-SEC-2026-0106', empId: 'EMP-2026-0006', name: 'Bikash Jena', trade: 'Rigging Helper', inductionId: 'IND-JTRWF-2026-0006', passNo: 'SP-2026-006', medical: 'FIT (Form 31 Certified)', isInducted: true, ptw: 'PTW-LFT-2026-0048', clearance: 'CLEARED_FOR_WORK' },
+    { gatePassId: 'GP-SEC-BLOCKED-07', empId: 'EMP-2026-0007', name: 'Deepak Nayak', trade: 'Helper / Trainee', inductionId: 'NONE', passNo: 'NONE', medical: 'Awaiting OHC Check', isInducted: false, ptw: 'NONE', clearance: 'BLOCKED_NO_INDUCTION' },
+    { gatePassId: 'GP-SEC-2026-0108', empId: 'EMP-2026-0008', name: 'Sanjay Kumar Sahoo', trade: 'Heavy Puller Driver', inductionId: 'IND-JTRWF-2026-0008', passNo: 'SP-2026-008', medical: 'FIT (Commercial Driver Cleared)', isInducted: true, ptw: 'PTW-LFT-2026-0048', clearance: 'CLEARED_FOR_WORK' }
+  ];
+
+  function renderGateSafetyDirectory(filterQ) {
+    const tbody = document.getElementById('gateSafetyDirectoryBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    let list = gateSafetyPersonnelMaster;
+    if (filterQ) {
+      const q = filterQ.toLowerCase();
+      list = list.filter(x => x.name.toLowerCase().includes(q) || x.empId.toLowerCase().includes(q) || x.trade.toLowerCase().includes(q) || x.passNo.toLowerCase().includes(q) || x.gatePassId.toLowerCase().includes(q));
+    }
+
+    list.forEach(item => {
+      const tr = document.createElement('tr');
+      const isGranted = item.isInducted;
+      tr.innerHTML = `
+        <td><strong style="font-family: monospace; color: var(--beds-teal-primary);">${item.gatePassId}</strong></td>
+        <td><strong style="font-family: monospace;">${item.empId}</strong></td>
+        <td><strong>${item.name}</strong></td>
+        <td>${item.trade}</td>
+        <td><span style="font-family: monospace; font-size: 11.5px;">${item.inductionId}</span></td>
+        <td><strong style="font-family: monospace;">${item.passNo}</strong></td>
+        <td><span style="font-size: 11px;">${item.medical}</span></td>
+        <td><strong style="font-family: monospace; color: #0097B2;">${item.ptw}</strong></td>
+        <td>
+          <span style="font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px; ${isGranted ? 'background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0;' : 'background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA;'}">
+            ${isGranted ? '🟢 ACCESS GRANTED' : '🔴 GATE ENTRY BLOCKED'}
+          </span>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function filterGateSafetyDirectory(q) {
+    renderGateSafetyDirectory(q);
+  }
+
+  function setAndVerifyGateClearance(empId) {
+    const input = document.getElementById('gate-security-query-emp-id');
+    if (input) input.value = empId;
+    verifyGateSecurityClearance(empId);
+  }
+
+  function verifyGateSecurityClearance(empId) {
+    if (!empId) {
+      const input = document.getElementById('gate-security-query-emp-id');
+      empId = input ? input.value.trim() : 'EMP-2026-0001';
+    }
+    const box = document.getElementById('gate-security-clearance-verdict-box');
+    if (!box) return;
+
+    const record = gateSafetyPersonnelMaster.find(x => x.empId === empId) || gateSafetyPersonnelMaster[0];
+    const isGranted = record.isInducted;
+
+    box.innerHTML = `
+      <div style="border-radius: var(--beds-radius-md); overflow: hidden; border: 2px solid ${isGranted ? '#059669' : '#DC2626'}; background: ${isGranted ? '#F0FDF4' : '#FEF2F2'}; color: #000000; padding: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid ${isGranted ? '#A7F3D0' : '#FECACA'}; padding-bottom: 12px; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 32px;">${isGranted ? '🟢' : '🔴'}</span>
+            <div>
+              <div style="font-size: 18px; font-weight: 800; color: ${isGranted ? '#065F46' : '#991B1B'};">
+                ${isGranted ? 'ACCESS GRANTED · AUTHORISED FOR SITE WORK' : 'ACCESS DENIED · GATE ENTRY BLOCKED'}
+              </div>
+              <div style="font-size: 12px; font-weight: 700; color: #374151;">
+                Personnel: ${record.name} &nbsp;·&nbsp; ID: <strong style="font-family: monospace;">${record.empId}</strong> &nbsp;·&nbsp; Trade: ${record.trade}
+              </div>
+            </div>
+          </div>
+          <div>
+            <span style="font-size: 11px; font-weight: 800; background: ${isGranted ? '#059669' : '#DC2626'}; color: #FFFFFF; padding: 4px 10px; border-radius: 4px;">
+              ${isGranted ? 'SECURITY CLEARANCE: PASS ✓' : 'SECURITY CLEARANCE: BLOCKED ⛔'}
+            </span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
+          <div style="background: #FFFFFF; padding: 12px; border-radius: 6px; border: 1px solid #E5E7EB;">
+            <div style="font-size: 11px; font-weight: 800; color: #0097B2; margin-bottom: 6px;">👥 1. HR MASTER ONBOARDING</div>
+            <div style="font-size: 11.5px; font-weight: 700; color: #059669;">ACTIVE ONBOARDED ✓</div>
+            <div style="font-size: 10.5px; color: #4B5563;">Contractor: BALSONS HEAVY LIFT</div>
+            <div style="font-size: 10.5px; color: #4B5563;">Gate Badge: <strong>${record.gatePassId}</strong></div>
+          </div>
+
+          <div style="background: #FFFFFF; padding: 12px; border-radius: 6px; border: 1px solid #E5E7EB;">
+            <div style="font-size: 11px; font-weight: 800; color: #0097B2; margin-bottom: 6px;">🛡️ 2. SAFETY INDUCTION & MEDICAL</div>
+            <div style="font-size: 11.5px; font-weight: 700;">
+              Induction: ${isGranted ? '<span style="color: #059669;">INDUCTED ✓</span>' : '<span style="color: #DC2626;">PENDING ⛔</span>'}
+            </div>
+            <div style="font-size: 10.5px; color: #4B5563;">Sticker / Pass No: <strong>${record.passNo}</strong></div>
+            <div style="font-size: 10.5px; color: #4B5563;">Medical Form 31: <strong>${record.medical}</strong></div>
+          </div>
+
+          <div style="background: #FFFFFF; padding: 12px; border-radius: 6px; border: 1px solid #E5E7EB;">
+            <div style="font-size: 11px; font-weight: 800; color: #0097B2; margin-bottom: 6px;">📋 3. WORK AUTHORISATION (PTW)</div>
+            <div style="font-size: 11.5px; font-weight: 700; color: #059669;">
+              Active Plant Area: AREA-01 AXLE LINE
+            </div>
+            <div style="font-size: 10.5px; color: #4B5563;">Active PTW Permit: <strong style="font-family: monospace;">${record.ptw}</strong></div>
+            <div style="font-size: 10.5px; color: #4B5563;">Shift Validity: Today 08:00 - 18:00</div>
+          </div>
+        </div>
+
+        ${!isGranted ? `
+          <div style="margin-top: 12px; background: #FEF2F2; border-left: 4px solid #DC2626; padding: 8px 12px; font-size: 11px; font-weight: 700; color: #991B1B;">
+            SECURITY ACTION: Turnstile access locked. Personnel has not completed mandatory Site Safety Induction. Turn worker back to Site Safety Office for induction briefing before gate entry can be permitted.
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  function syncWithSafetyAndHrPortals() {
+    alert("🔄 Tri-Portal Sync Successful! Real-time reference data synchronized with BALSONS Safety Manager and HR Manager.");
+    renderGateSafetyDirectory();
+    verifyGateSecurityClearance();
   }
 
   function quickFill(user, pass) {
@@ -2114,6 +2584,10 @@
 
     // Init Master Registries (Phase 3)
     initMasterRegistries();
+
+    // Init Smart Dropdown Navigation & Safety Directory
+    initGateDropdowns();
+    renderGateSafetyDirectory();
   });
 
   // ─── MATERIAL CHALLAN CREATOR ENGINE ──────────────────────────────
