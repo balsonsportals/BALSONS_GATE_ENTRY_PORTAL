@@ -2372,9 +2372,11 @@
 
 <script src="assets/js/config.js"></script>
 <script src="assets/js/api-client.js"></script>
+<script src="assets/js/balsons-sam-auth.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/dossier-360.js"></script>
-<script src="assets/js/beds-workspace.js"></script>
+<script src="assets/js/beds-superadmin.js"></script>
+  <script src="assets/js/beds-workspace.js"></script>
 <script>
   function switchTab(tabName) {
     // Direct nav tabs
@@ -2625,7 +2627,26 @@
 
   // Auto-check session on load
   window.addEventListener('DOMContentLoaded', () => {
-    if (BalsonsAuth.isLoggedIn()) {
+    if (window.BalsonsSAMAuth) {
+      BalsonsSAMAuth.renderGlobalSuperAdminBar('gate_entry', (newSession) => {
+        window.location.reload();
+      });
+      const samSession = BalsonsSAMAuth.getSession();
+      if (samSession && BalsonsSAMAuth.canAccessPortal('gate_entry')) {
+        const loginM = document.getElementById('loginModal');
+        if (loginM) loginM.style.display = 'none';
+        renderUserSession({
+          username: samSession.username,
+          fullName: samSession.fullName,
+          role: samSession.role === 'SUPER_ADMIN' ? 'Owner / Super Admin' : samSession.roleInfo.title
+        });
+      } else if (BalsonsAuth.isLoggedIn()) {
+        document.getElementById('loginModal').style.display = 'none';
+        renderUserSession(BalsonsAuth.getUser());
+      } else {
+        document.getElementById('loginModal').style.display = 'flex';
+      }
+    } else if (BalsonsAuth.isLoggedIn()) {
       document.getElementById('loginModal').style.display = 'none';
       renderUserSession(BalsonsAuth.getUser());
     } else {
