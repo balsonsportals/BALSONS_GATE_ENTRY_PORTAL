@@ -7,7 +7,7 @@
 const CONFIG = {
   PROJECT_ID: 'PRJ-JTRWF-SCHULER',
   SYSTEM_NAME: 'BALSONS JTRWF Gate Entry & Site Access Portal',
-  VERSION: '1.4.0-clearance',
+  VERSION: '1.5.0-transactions',
   ENV: 'staging',
   AUTH_HEADER_KEY: 'BALSONS_JTRWF_GATE_PHASE0_DEV_KEY',
   DEFAULT_SPREADSHEET_ID: '1yAuZOXc8WoC2TvTvnEWMrOyLl_50BRuJgDed_pdFT3o',
@@ -175,6 +175,37 @@ function doPost(e) {
         break;
       case 'clearance.list':
         responseData = ClearanceEngine.listRecentClearances(payload.limit);
+        break;
+
+      // ─── PHYSICAL GATE TRANSACTIONS & PASS CENTER (PHASE 5) ──────────
+      // Material Inward (PO / DC)
+      case 'transaction.inward.create':
+        responseData = GateTransactionService.createInward(payload, session);
+        break;
+      case 'transaction.inward.list':
+        responseData = GateTransactionService.listInwards();
+        break;
+      case 'transaction.inward.update_status':
+        responseData = GateTransactionService.updateInwardStatus(payload, session);
+        break;
+
+      // Gate Pass Center (RGP / NRGP)
+      case 'transaction.gatepass.create':
+        responseData = GateTransactionService.createGatePass(payload, session);
+        break;
+      case 'transaction.gatepass.close_return':
+        responseData = GateTransactionService.closeRgpReturn(payload, session);
+        break;
+      case 'transaction.gatepass.list':
+        responseData = GateTransactionService.listGatePasses();
+        break;
+
+      // Physical Gate Movement Log
+      case 'transaction.movement.log':
+        responseData = GateTransactionService.recordGateMovement(payload, session);
+        break;
+      case 'transaction.movement.list':
+        responseData = GateTransactionService.listGateMovements(payload.limit);
         break;
 
       default:

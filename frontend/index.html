@@ -1114,89 +1114,260 @@
     </div>
   </section>
 
-  <!-- TAB 2: MATERIAL INWARD -->
+    <!-- TAB 2: MATERIAL INWARD GATE ENTRY (IGE) - PHASE 5 -->
   <section id="tab-inward" class="section-view">
-    <div class="beds-card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h2>🚚 Material Inward Gate Entry (IGE)</h2>
-        <span class="status-pill status-info">Auto-Notifies Store Manager</span>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h2 style="font-size: 18px; font-weight: 800; color: var(--beds-charcoal-heading); display: flex; align-items: center; gap: 8px;">
+          🚚 Material Inward Gate Entry (IGE)
+          <span class="status-pill status-info">PO / DC Verification</span>
+        </h2>
+        <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
+          Physical gate receipt against Purchase Orders & Delivery Challans. Auto-generates IGE token for Store verification.
+        </p>
       </div>
-      <p style="font-size: 13px; margin-bottom: 20px;">
-        Log incoming shipments against Purchase Orders. Generates IGE token for Store verification.
-      </p>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-        <div class="form-group">
-          <label>Purchase Order (PO) Number</label>
-          <input type="text" placeholder="e.g. PO-JTRWF-2026-041">
-        </div>
-        <div class="form-group">
-          <label>Delivery Challan / Invoice No.</label>
-          <input type="text" placeholder="e.g. DC-78945 / INV-2026-11">
-        </div>
-        <div class="form-group">
-          <label>Vendor / Supplier Name</label>
-          <input type="text" placeholder="e.g. Schuler AG / Stanley / Ferroterro">
-        </div>
-        <div class="form-group">
-          <label>Transporter & Vehicle Number</label>
-          <input type="text" placeholder="e.g. VRL Logistics • OD-02-AK-9811">
-        </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <span class="status-pill status-info">Gate-1 Heavy Haul</span>
+        <span class="status-pill status-success">Instant Store Alert</span>
       </div>
-      <button class="btn btn-primary" onclick="alert('Inward logged successfully. Notification sent to Store Manager.')">
-        Generate Inward Token (IGE-2026-XXXX)
-      </button>
     </div>
-  </section>
 
-  <!-- TAB 3: GATE PASS CENTER -->
-  <section id="tab-gatepass" class="section-view">
+    <!-- 2-Column Console -->
+    <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; align-items: flex-start; margin-bottom: 24px;">
+      
+      <!-- Left Column: Inward Entry Form -->
+      <div class="beds-card">
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--beds-charcoal-heading);">
+          1. Physical Receipt & Consignment Parameters
+        </h3>
+
+        <!-- Quick PO Presets -->
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--beds-text-secondary); display: block; margin-bottom: 6px;">
+            Quick Inward Presets:
+          </label>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadInwardPreset('schuler_cyl')">⚙️ Schuler 100T Cyl</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadInwardPreset('gantry_rails')">🛤️ Gantry Rails</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadInwardPreset('direct_consumables')">📦 Consumables</button>
+          </div>
+        </div>
+
+        <form id="inwardForm" onsubmit="handleInwardSubmit(event)">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label>Purchase Order (PO) Number</label>
+              <input type="text" id="inwPoNumber" placeholder="e.g. PO-JTRWF-2026-041" required>
+            </div>
+            <div class="form-group">
+              <label>Delivery Challan / Invoice No</label>
+              <input type="text" id="inwDcNumber" placeholder="e.g. DC-78945 / INV-2026-11" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px;">
+            <div class="form-group">
+              <label>Vendor / Supplier Name</label>
+              <input type="text" id="inwVendorName" placeholder="e.g. Schuler AG / Ferroterro / Stanley" required>
+            </div>
+            <div class="form-group">
+              <label>Transporter Name</label>
+              <input type="text" id="inwTransporter" placeholder="e.g. VRL Logistics Ltd" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label>Transport Vehicle Registration No</label>
+              <input type="text" id="inwVehicleNo" placeholder="e.g. OD-02-AK-9811" required style="font-weight: 700;">
+            </div>
+            <div class="form-group">
+              <label>Driver Name & Mobile</label>
+              <input type="text" id="inwDriverInfo" placeholder="e.g. Manoj Sahoo • 9876543210" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px;">
+            <div class="form-group">
+              <label>Material Summary & Description</label>
+              <input type="text" id="inwItemSummary" placeholder="e.g. Hydraulic Cylinder Assembly (100T)" required>
+            </div>
+            <div class="form-group">
+              <label>Quantity / Gross Weight</label>
+              <input type="text" id="inwQty" placeholder="e.g. 2 Nos (14.5 MT)" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label>Assigned Unloading Bay</label>
+              <select id="inwAllocatedBay" class="beds-select">
+                <option value="Main Press Pit (Bay-3)">Main Press Pit (Bay-3)</option>
+                <option value="Billet Preparation Bay">Billet Preparation Bay</option>
+                <option value="Overhead Gantry Runway (Bay-1)">Overhead Gantry Runway (Bay-1)</option>
+                <option value="Central Raw Material Yard">Central Raw Material Yard</option>
+                <option value="Central Project Store">Central Project Store</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Physical Gate Checkpoint</label>
+              <select id="inwGateNo" class="beds-select">
+                <option value="Gate-1 (Heavy Haul Plaza)">Gate-1 (Heavy Haul Plaza)</option>
+                <option value="Gate-2 (West Materials)">Gate-2 (West Materials)</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 11px; font-weight: 700; margin-top: 6px;">
+            ⚡ Record Physical Gate Inward & Issue IGE Token
+          </button>
+        </form>
+      </div>
+
+      <!-- Right Column: Active Inward Status & Quick Bay Timeline -->
+      <div class="beds-card" style="min-height: 480px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 14px; font-weight: 800; color: var(--beds-charcoal-heading);">
+              2. Real-Time Unloading Bay Status
+            </h3>
+            <span class="status-pill status-info" id="inwBayActiveCount">3 Vehicles in Bays</span>
+          </div>
+
+          <p style="font-size: 11.5px; color: var(--beds-text-secondary); margin-bottom: 14px;">
+            Vehicles admitted through Gate-1 currently occupying unloading positions.
+          </p>
+
+          <div id="activeInwardCardsContainer" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div style="background: var(--beds-bg-page); border: 1px solid var(--beds-border); padding: 12px; border-radius: var(--beds-radius-md); margin-top: 16px;">
+          <div style="font-size: 11px; font-weight: 800; color: var(--beds-charcoal-heading); text-transform: uppercase; margin-bottom: 4px;">
+            📢 Automated Store Handover Protocol:
+          </div>
+          <div style="font-size: 11px; color: var(--beds-text-secondary); line-height: 1.4;">
+            Once unloading is completed in the bay, click <strong>"Hand Over to Store"</strong>. This updates the material custody to BALSONS Store Manager and logs the physical vehicle departure.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Live Material Inward Table -->
     <div class="table-container">
       <div class="table-header">
         <div>
-          <h2>📄 Controlled Gate Pass Center (RGP / NRGP)</h2>
+          <h2>📋 Material Inward Register (MATERIAL_INWARD_REGISTER)</h2>
           <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
-            Returnable tools tracking and non-returnable scrap/material clearance.
+            Historical gate ledger of incoming consignments against verified POs and DCs.
           </p>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="alert('Opening Gate Pass Creator...')">
-          + New Gate Pass
-        </button>
+        <div style="display: flex; gap: 8px;">
+          <select id="filterInwStatus" class="beds-select" style="width: 170px; font-size: 12px;" onchange="filterInwardTable(this.value)">
+            <option value="">All Statuses</option>
+            <option value="IN_UNLOADING_BAY">In Unloading Bay</option>
+            <option value="STORE_ACCEPTED">Store Accepted</option>
+          </select>
+          <input type="text" class="beds-input" style="width: 220px; font-size: 12px;" placeholder="Search IGE / PO / Vendor..." oninput="searchInwardTable(this.value)">
+        </div>
       </div>
-      <table class="beds-table">
+      <table class="beds-table" id="inwardTable">
         <thead>
           <tr>
-            <th>Pass No</th>
+            <th>IGE Token</th>
+            <th>PO / DC No</th>
+            <th>Vendor & Transporter</th>
+            <th>Vehicle No</th>
+            <th>Material Description & Qty</th>
+            <th>Allocated Bay</th>
+            <th>Gate In Time</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="inwardTableBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+    <!-- TAB 3: CONTROLLED GATE PASS CENTER (RGP / NRGP) - PHASE 5 -->
+  <section id="tab-gatepass" class="section-view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h2 style="font-size: 18px; font-weight: 800; color: var(--beds-charcoal-heading); display: flex; align-items: center; gap: 8px;">
+          📄 Controlled Gate Pass Center (RGP / NRGP)
+          <span class="status-pill status-info">Outbound Asset Tracking</span>
+        </h2>
+        <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
+          Statutory outbound movement for returnable tools/plant (RGP) and non-returnable scrap/materials (NRGP).
+        </p>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="openCreateGatePassModal()">
+          + Issue New Gate Pass
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Summary Bar -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
+      <div class="kpi-card teal" style="padding: 14px 18px;">
+        <div class="kpi-label">Active RGPs Outbound</div>
+        <div class="kpi-value" id="kpiRgpActive" style="font-size: 24px;">3</div>
+        <div class="kpi-sub">Tools & plant awaiting return</div>
+      </div>
+      <div class="kpi-card red" style="padding: 14px 18px; border-left: 4px solid var(--beds-alert-red);">
+        <div class="kpi-label">🚨 Overdue Returnables</div>
+        <div class="kpi-value" id="kpiRgpOverdue" style="font-size: 24px; color: var(--beds-alert-red);">1</div>
+        <div class="kpi-sub">Expected return date expired</div>
+      </div>
+      <div class="kpi-card green" style="padding: 14px 18px;">
+        <div class="kpi-label">NRGPs Cleared (Month)</div>
+        <div class="kpi-value" id="kpiNrgpCount" style="font-size: 24px;">8</div>
+        <div class="kpi-sub">Scrap, oil drums & disposals</div>
+      </div>
+      <div class="kpi-card amber" style="padding: 14px 18px;">
+        <div class="kpi-label">Reconciled Returns</div>
+        <div class="kpi-value" id="kpiReturnsClosed" style="font-size: 24px;">14</div>
+        <div class="kpi-sub">Safely checked back into Store</div>
+      </div>
+    </div>
+
+    <!-- Gate Pass Table with Filter Tabs -->
+    <div class="table-container">
+      <div class="table-header">
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-secondary btn-sm" id="btnGpAll" style="font-weight: 700;" onclick="filterGatePassView('ALL')">All Passes</button>
+          <button class="btn btn-secondary btn-sm" id="btnGpRgp" onclick="filterGatePassView('RGP')">Returnable (RGP)</button>
+          <button class="btn btn-secondary btn-sm" id="btnGpNrgp" onclick="filterGatePassView('NRGP')">Non-Returnable (NRGP)</button>
+          <button class="btn btn-secondary btn-sm" id="btnGpOverdue" style="color: var(--beds-alert-red); font-weight: 700;" onclick="filterGatePassView('OVERDUE')">🚨 Overdue Alerts</button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" class="beds-input" style="width: 240px; font-size: 12px;" placeholder="Search Pass No / Consignee / Item..." oninput="searchGatePassTable(this.value)">
+        </div>
+      </div>
+      <table class="beds-table" id="gatePassTable">
+        <thead>
+          <tr>
+            <th>Pass ID</th>
             <th>Type</th>
             <th>Item Description</th>
             <th>Qty</th>
-            <th>Sent To</th>
+            <th>Consignee / Destination</th>
+            <th>Vehicle No</th>
+            <th>Dispatch Date</th>
             <th>Expected Return</th>
             <th>Approval</th>
             <th>Gate Status</th>
+            <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td><strong>RGP-2026-0004</strong></td>
-            <td><span class="status-pill status-warning">RGP</span></td>
-            <td>100T Hydraulic Climbing Jack</td>
-            <td class="tabular-nums">2 Nos</td>
-            <td>Precision Calibrators Kolkata</td>
-            <td class="tabular-nums">2026-11-25</td>
-            <td><span class="status-pill status-success">Approved (Store Lead)</span></td>
-            <td><span class="status-pill status-success">Exited Gate 1</span></td>
-          </tr>
-          <tr>
-            <td><strong>NRGP-2026-0019</strong></td>
-            <td><span class="status-pill status-info">NRGP</span></td>
-            <td>Empty Hydraulic Oil Drums (Scrap)</td>
-            <td class="tabular-nums">18 Drums</td>
-            <td>Authorized Scrap Recycler</td>
-            <td>N/A</td>
-            <td><span class="status-pill status-success">Approved (PM)</span></td>
-            <td><span class="status-pill status-success">Cleared</span></td>
-          </tr>
+        <tbody id="gatePassTableBody">
+          <!-- Populated by JS -->
         </tbody>
       </table>
     </div>
@@ -1681,6 +1852,166 @@
   </div>
 </div>
 
+<!-- Create Gate Pass Modal (RGP / NRGP) -->
+<div id="modalCreateGatePass" class="beds-modal-backdrop" style="display: none;">
+  <div class="beds-modal" style="max-width: 620px;">
+    <div class="modal-header">
+      <div>
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--beds-charcoal-heading);">
+          📄 Controlled Outbound Gate Pass Issuer
+        </h3>
+        <p style="font-size: 11px; color: var(--beds-text-secondary); margin: 0;">
+          Issue Returnable (RGP) or Non-Returnable (NRGP) gate clearance.
+        </p>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeCreateGatePassModal()">✕</button>
+    </div>
+
+    <form id="createGatePassForm" onsubmit="handleCreateGatePassSubmit(event)">
+      <!-- Pass Type Selector -->
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--beds-charcoal-heading); display: block; margin-bottom: 6px;">
+          Gate Pass Classification:
+        </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <label style="display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--beds-teal-primary); padding: 10px 14px; border-radius: var(--beds-radius-md); cursor: pointer; background: var(--beds-bg-page);">
+            <input type="radio" name="gpTypeRadio" value="RGP" checked onchange="toggleGpTypeFields()">
+            <div>
+              <strong style="color: var(--beds-teal-primary);">RGP (Returnable)</strong>
+              <div style="font-size: 10.5px; color: var(--beds-text-secondary);">Tools, jacks, instruments, calibration</div>
+            </div>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--beds-border); padding: 10px 14px; border-radius: var(--beds-radius-md); cursor: pointer; background: var(--beds-bg-page);">
+            <input type="radio" name="gpTypeRadio" value="NRGP" onchange="toggleGpTypeFields()">
+            <div>
+              <strong style="color: var(--beds-charcoal-heading);">NRGP (Non-Returnable)</strong>
+              <div style="font-size: 10.5px; color: var(--beds-text-secondary);">Scrap, discarded oil drums, consumables</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Item Description & Specifications</label>
+        <input type="text" id="gpItemDescription" placeholder="e.g. 100T Hydraulic Climbing Jack (Double Acting)" required>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="form-group">
+          <label>Quantity & Unit</label>
+          <input type="text" id="gpQty" placeholder="e.g. 2 Nos" required>
+        </div>
+        <div class="form-group">
+          <label>Equipment Serial / Tag No (If Any)</label>
+          <input type="text" id="gpSerialNo" placeholder="e.g. EQ-2026-0001 / BHLS-HJ-100-01">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px;">
+        <div class="form-group">
+          <label>Consignee / Destination Vendor</label>
+          <input type="text" id="gpConsignee" placeholder="e.g. Precision Calibrators Kolkata" required>
+        </div>
+        <div class="form-group">
+          <label>Transport Vehicle No</label>
+          <input type="text" id="gpVehicleNo" placeholder="e.g. OD-02-AX-8910" required>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;" id="gpRgpSpecificRow">
+        <div class="form-group">
+          <label>Purpose of Dispatch</label>
+          <select id="gpPurpose" class="beds-select">
+            <option value="Third Party Calibration & Certification">Third Party Calibration & Certification</option>
+            <option value="Emergency Workshop Repair & Overhaul">Emergency Workshop Repair & Overhaul</option>
+            <option value="Tool Sharpening / Precision Machining">Tool Sharpening / Precision Machining</option>
+            <option value="Scrap / Metal Recycling Disposal">Scrap / Metal Recycling Disposal</option>
+            <option value="Return to Supplier / Rental Demobilization">Return to Supplier / Rental Demobilization</option>
+          </select>
+        </div>
+        <div class="form-group" id="gpReturnDateField">
+          <label><strong style="color: var(--beds-alert-red);">*</strong> Expected Return Date</label>
+          <input type="date" id="gpExpectedReturnDate" class="beds-input">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Special Dispatch Remarks / Condition Notes</label>
+        <textarea id="gpRemarks" rows="2" class="beds-textarea" placeholder="e.g. Outbound for annual NABL calibration. Sent along with original Form-11 test certificate copy..."></textarea>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+        <button type="button" class="btn btn-secondary" onclick="closeCreateGatePassModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="font-weight: 700;">
+          Issue Gate Pass
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Acknowledge Return Modal (RGP Close-Out) -->
+<div id="modalAcknowledgeReturn" class="beds-modal-backdrop" style="display: none;">
+  <div class="beds-modal" style="max-width: 500px;">
+    <div class="modal-header">
+      <div>
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--beds-charcoal-heading);">
+          🔄 Reconcile Returnable Gate Pass (RGP)
+        </h3>
+        <p style="font-size: 11px; color: var(--beds-text-secondary); margin: 0;">
+          Confirm physical inward return to BALSONS Project Store.
+        </p>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeAcknowledgeReturnModal()">✕</button>
+    </div>
+
+    <form id="acknowledgeReturnForm" onsubmit="handleAcknowledgeReturnSubmit(event)">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+        <div class="form-group">
+          <label>Pass ID</label>
+          <input type="text" id="retPassId" readonly style="background: var(--beds-bg-page); font-weight: 800;">
+        </div>
+        <div class="form-group">
+          <label>Expected Return</label>
+          <input type="text" id="retExpectedDate" readonly style="background: var(--beds-bg-page);">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Item Description & Qty</label>
+        <input type="text" id="retItemSummary" readonly style="background: var(--beds-bg-page); font-weight: 600;">
+      </div>
+
+      <div class="form-group">
+        <label>Consignee Returned From</label>
+        <input type="text" id="retConsignee" readonly style="background: var(--beds-bg-page);">
+      </div>
+
+      <div class="form-group">
+        <label>Receiving Physical Condition</label>
+        <select id="retCondition" class="beds-select">
+          <option value="Operational & Certified (Calibration Cert Received)">Operational & Certified (Calibration Cert Received)</option>
+          <option value="Operational (Physical Condition Satisfactory)">Operational (Physical Condition Satisfactory)</option>
+          <option value="Damaged / Quarantine Required">Damaged / Quarantine Required</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Receiving Remarks / Store Bin Location</label>
+        <textarea id="retRemarks" rows="2" class="beds-textarea" placeholder="e.g. Inspected by Store Officer. Calibration valid till Nov 2027. Returned to Bay-3 Heavy Rigging Rack."></textarea>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+        <button type="button" class="btn btn-secondary" onclick="closeAcknowledgeReturnModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="background: var(--beds-status-success); border-color: var(--beds-status-success); color: #fff; font-weight: 700;">
+          Confirm Inward & Close RGP
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
 <script src="assets/js/config.js"></script>
 <script src="assets/js/api-client.js"></script>
 <script src="assets/js/auth.js"></script>
@@ -1749,6 +2080,8 @@
     initChallanCreator();
     // Init Clearance Engine (Phase 4)
     initClearanceEngine();
+    // Init Physical Gate Transactions & Pass Center (Phase 5)
+    initGateTransactions();
 
     // Init Master Registries (Phase 3)
     initMasterRegistries();
@@ -2928,6 +3261,662 @@ Subject: ${item.fullName} (${item.trade})
 Decision: ${item.decision}
 Valid For: ${item.validityHours} Hours
 Bay: ${item.targetArea}`);
+  }
+
+
+
+  // ─── PHASE 5: PHYSICAL GATE TRANSACTIONS & PASS CENTER (RGP / NRGP) ───
+  let inwardData = [
+    {
+      inwardId: 'IGE-2026-0014',
+      poNumber: 'PO-JTRWF-2026-041',
+      dcNumber: 'DC-SCH-9021',
+      vendorName: 'Schuler AG Germany',
+      transporter: 'VRL Heavy Logistics',
+      vehicleNo: 'OD-02-AK-9811',
+      driverInfo: 'Manoj Sahoo • 9876543210',
+      itemSummary: 'Main Press Pit Hydraulic Cylinder Assembly (100T)',
+      qty: '2 Nos (14.5 MT)',
+      allocatedBay: 'Main Press Pit (Bay-3)',
+      gateNo: 'Gate-1 (Heavy Haul Plaza)',
+      gateInTimestamp: '2026-11-19T09:30:00Z',
+      receivedBy: 'Security Guard Gate 1',
+      status: 'IN_UNLOADING_BAY'
+    },
+    {
+      inwardId: 'IGE-2026-0013',
+      poNumber: 'PO-JTRWF-2026-055',
+      dcNumber: 'DC-FER-4412',
+      vendorName: 'Ferroterro Rigging Kolkata',
+      transporter: 'Direct Transport',
+      vehicleNo: 'WB-19-B-7744',
+      driverInfo: 'Pintu Das • 9831122334',
+      itemSummary: 'Overhead Gantry Crane Runway Rail Sections',
+      qty: '12 Rails (8.2 MT)',
+      allocatedBay: 'Overhead Gantry Runway (Bay-1)',
+      gateNo: 'Gate-1 (Heavy Haul Plaza)',
+      gateInTimestamp: '2026-11-19T10:15:00Z',
+      receivedBy: 'Security Guard Gate 1',
+      status: 'IN_UNLOADING_BAY'
+    },
+    {
+      inwardId: 'IGE-2026-0012',
+      poNumber: 'PO-JTRWF-2026-038',
+      dcNumber: 'INV-2026-1102',
+      vendorName: 'Stanley Black & Decker India',
+      transporter: 'BlueDart Surface Express',
+      vehicleNo: 'OD-05-F-1200',
+      driverInfo: 'Rajesh Nayak • 9937012345',
+      itemSummary: 'Heavy Torque Multipliers & Impact Sockets',
+      qty: '6 Sets',
+      allocatedBay: 'Central Project Store',
+      gateNo: 'Gate-1 (Heavy Haul Plaza)',
+      gateInTimestamp: '2026-11-19T08:00:00Z',
+      receivedBy: 'Security Guard Gate 1',
+      status: 'STORE_ACCEPTED'
+    }
+  ];
+
+  let gatePassData = [
+    {
+      passId: 'RGP-2026-0004',
+      passType: 'RGP',
+      itemDescription: '100T Hydraulic Climbing Jack (Double Acting)',
+      serialNo: 'EQ-2026-0001 / BHLS-HJ-100-01',
+      qty: '2 Nos',
+      consignee: 'Precision Calibrators Kolkata',
+      vehicleNo: 'OD-02-AX-8910',
+      dispatchDate: '2026-11-10',
+      expectedReturnDate: '2026-11-17', // Overdue!
+      actualReturnDate: '',
+      approvalStatus: 'APPROVED',
+      approvedBy: 'BALSONS Project Owner',
+      gateStatus: 'DISPATCHED_EXITED',
+      remarks: 'Outbound for NABL load cell & gauge recalibration.'
+    },
+    {
+      passId: 'RGP-2026-0005',
+      passType: 'RGP',
+      itemDescription: 'Multi-Gas Detector 4-Gas Kit (LEL, O2, CO, H2S)',
+      serialNo: 'EQ-2026-0018 / GD-04',
+      qty: '1 Set',
+      consignee: 'Dräger India Service Center',
+      vehicleNo: 'OD-02-AX-8910',
+      dispatchDate: '2026-11-18',
+      expectedReturnDate: '2026-11-26',
+      actualReturnDate: '',
+      approvalStatus: 'APPROVED',
+      approvedBy: 'BALSONS Project Owner',
+      gateStatus: 'DISPATCHED_EXITED',
+      remarks: 'Bump testing & sensor calibration.'
+    },
+    {
+      passId: 'NRGP-2026-0019',
+      passType: 'NRGP',
+      itemDescription: 'Empty Hydraulic Oil Drums (Cleaned & De-gassed)',
+      serialNo: 'N/A',
+      qty: '18 Drums',
+      consignee: 'Mahavir Metal & Drum Recyclers',
+      vehicleNo: 'OD-02-N-5512',
+      dispatchDate: '2026-11-19',
+      expectedReturnDate: 'N/A',
+      actualReturnDate: '',
+      approvalStatus: 'APPROVED',
+      approvedBy: 'BALSONS Project Owner',
+      gateStatus: 'CLEARED_EXITED',
+      remarks: 'Approved scrap metal & barrel disposal under environmental protocol.'
+    },
+    {
+      passId: 'RGP-2026-0001',
+      passType: 'RGP',
+      itemDescription: 'Laser Shaft Alignment Tool Kit',
+      serialNo: 'EQ-2026-0009',
+      qty: '1 Set',
+      consignee: 'Faro Technologies India',
+      vehicleNo: 'OD-02-AX-8910',
+      dispatchDate: '2026-11-01',
+      expectedReturnDate: '2026-11-10',
+      actualReturnDate: '2026-11-09',
+      approvalStatus: 'APPROVED',
+      approvedBy: 'BALSONS Project Owner',
+      gateStatus: 'RETURNED_CLOSED',
+      remarks: 'Returned verified in good working order.'
+    }
+  ];
+
+  let currentGpFilter = 'ALL';
+
+  function initGateTransactions() {
+    renderInwardView();
+    renderGatePassView();
+    updateRadarMetrics();
+  }
+
+  // ─── MATERIAL INWARD FUNCTIONS ───────────────────────────────────────
+  function loadInwardPreset(preset) {
+    if (preset === 'schuler_cyl') {
+      document.getElementById('inwPoNumber').value = 'PO-JTRWF-2026-041';
+      document.getElementById('inwDcNumber').value = 'DC-SCH-' + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('inwVendorName').value = 'Schuler AG Germany';
+      document.getElementById('inwTransporter').value = 'VRL Heavy Logistics';
+      document.getElementById('inwVehicleNo').value = 'OD-02-AK-9811';
+      document.getElementById('inwDriverInfo').value = 'Manoj Sahoo • 9876543210';
+      document.getElementById('inwItemSummary').value = 'Hydraulic Cylinder Assembly (100T) for Press Pit';
+      document.getElementById('inwQty').value = '2 Nos (14.5 MT)';
+      document.getElementById('inwAllocatedBay').value = 'Main Press Pit (Bay-3)';
+    } else if (preset === 'gantry_rails') {
+      document.getElementById('inwPoNumber').value = 'PO-JTRWF-2026-055';
+      document.getElementById('inwDcNumber').value = 'DC-FER-' + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('inwVendorName').value = 'Ferroterro Rigging Kolkata';
+      document.getElementById('inwTransporter').value = 'Tata Logistics';
+      document.getElementById('inwVehicleNo').value = 'WB-19-B-7744';
+      document.getElementById('inwDriverInfo').value = 'Pintu Das • 9831122334';
+      document.getElementById('inwItemSummary').value = 'Overhead Gantry Crane Runway Rail Sections';
+      document.getElementById('inwQty').value = '12 Rails (8.2 MT)';
+      document.getElementById('inwAllocatedBay').value = 'Overhead Gantry Runway (Bay-1)';
+    } else if (preset === 'direct_consumables') {
+      document.getElementById('inwPoNumber').value = 'PO-JTRWF-2026-088';
+      document.getElementById('inwDcNumber').value = 'INV-STA-' + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('inwVendorName').value = 'Stanley Black & Decker';
+      document.getElementById('inwTransporter').value = 'BlueDart Express';
+      document.getElementById('inwVehicleNo').value = 'OD-05-F-1200';
+      document.getElementById('inwDriverInfo').value = 'Rajesh Nayak • 9937012345';
+      document.getElementById('inwItemSummary').value = 'Heavy Rigging Wire Rope Grips & Shackle Bolts';
+      document.getElementById('inwQty').value = '40 Boxes';
+      document.getElementById('inwAllocatedBay').value = 'Central Project Store';
+    }
+  }
+
+  async function handleInwardSubmit(event) {
+    if (event) event.preventDefault();
+
+    const po = document.getElementById('inwPoNumber').value.trim();
+    const dc = document.getElementById('inwDcNumber').value.trim();
+    const vendor = document.getElementById('inwVendorName').value.trim();
+    const transporter = document.getElementById('inwTransporter').value.trim();
+    const veh = document.getElementById('inwVehicleNo').value.trim().toUpperCase();
+    const driver = document.getElementById('inwDriverInfo').value.trim();
+    const item = document.getElementById('inwItemSummary').value.trim();
+    const qty = document.getElementById('inwQty').value.trim();
+    const bay = document.getElementById('inwAllocatedBay').value;
+    const gate = document.getElementById('inwGateNo').value;
+
+    const newId = 'IGE-2026-' + String(Math.floor(1000 + Math.random() * 9000));
+    const nowIso = new Date().toISOString();
+
+    const newRec = {
+      inwardId: newId,
+      poNumber: po,
+      dcNumber: dc,
+      vendorName: vendor,
+      transporter: transporter,
+      vehicleNo: veh,
+      driverInfo: driver,
+      itemSummary: item,
+      qty: qty,
+      allocatedBay: bay,
+      gateNo: gate,
+      gateInTimestamp: nowIso,
+      receivedBy: (BalsonsAuth.currentUser ? BalsonsAuth.currentUser.fullName : 'Security Guard Gate 1'),
+      status: 'IN_UNLOADING_BAY'
+    };
+
+    try {
+      const res = await BalsonsApi.call('transaction.inward.create', {
+        poNumber: po,
+        dcNumber: dc,
+        vendorName: vendor,
+        transporter: transporter,
+        vehicleNo: veh,
+        itemSummary: item,
+        qty: qty,
+        allocatedBay: bay,
+        gateNo: gate
+      });
+      if (res.success && res.data && res.data.inwardId) {
+        newRec.inwardId = res.data.inwardId;
+      }
+    } catch (err) {
+      console.warn('Inward local fallback:', err.message);
+    }
+
+    inwardData.unshift(newRec);
+    renderInwardView();
+    updateRadarMetrics();
+
+    alert(`✅ Material Inward Gate Entry (IGE) Logged Successfully!
+
+Token: ${newRec.inwardId}
+Vehicle: ${veh}
+Allocated Bay: ${bay}
+Vendor: ${vendor}
+
+Automated dispatch notification sent to Store Lead.`);
+    document.getElementById('inwardForm').reset();
+  }
+
+  async function markInwardStoreAccepted(inwardId) {
+    const item = inwardData.find(x => x.inwardId === inwardId);
+    if (!item) return;
+
+    if (!confirm(`Confirm Store Acceptance for ${inwardId} (${item.itemSummary})?
+
+This confirms unloading is complete and vehicle ${item.vehicleNo} has exited the unloading bay.`)) {
+      return;
+    }
+
+    item.status = 'STORE_ACCEPTED';
+
+    try {
+      await BalsonsApi.call('transaction.inward.update_status', {
+        inwardId: inwardId,
+        status: 'STORE_ACCEPTED'
+      });
+    } catch (err) {
+      console.warn('Update inward local fallback:', err.message);
+    }
+
+    renderInwardView();
+    updateRadarMetrics();
+  }
+
+  function renderInwardView(filterStatus, searchQuery) {
+    // 1. Render Active Bay Cards
+    const cardsContainer = document.getElementById('activeInwardCardsContainer');
+    const bayCountEl = document.getElementById('inwBayActiveCount');
+    if (cardsContainer) {
+      cardsContainer.innerHTML = '';
+      const inBays = inwardData.filter(x => x.status === 'IN_UNLOADING_BAY');
+      if (bayCountEl) bayCountEl.textContent = `${inBays.length} Vehicles in Bays`;
+
+      if (inBays.length === 0) {
+        cardsContainer.innerHTML = `
+          <div style="text-align: center; padding: 24px; color: var(--beds-text-muted); font-size: 12px; background: var(--beds-bg-page); border-radius: var(--beds-radius-md);">
+            No vehicles currently in unloading bays. All consignments cleared.
+          </div>
+        `;
+      } else {
+        inBays.forEach(b => {
+          const card = document.createElement('div');
+          card.style.cssText = 'background: var(--beds-bg-page); border: 1.5px solid var(--beds-teal-primary); border-radius: var(--beds-radius-md); padding: 12px 14px;';
+          card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <div>
+                <strong style="font-family: monospace; font-size: 13px; color: var(--beds-teal-primary);">${b.inwardId}</strong>
+                <span class="status-pill status-info" style="font-size: 9.5px; margin-left: 6px;">🚚 ${escapeHtml(b.vehicleNo)}</span>
+              </div>
+              <span class="status-pill status-warning" style="font-size: 9.5px;">UNLOADING IN PROGRESS</span>
+            </div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--beds-charcoal-heading); margin-bottom: 4px;">
+              ${escapeHtml(b.itemSummary)} (${escapeHtml(b.qty)})
+            </div>
+            <div style="font-size: 11px; color: var(--beds-text-secondary); margin-bottom: 8px;">
+              Vendor: <strong>${escapeHtml(b.vendorName)}</strong> • Bay: <span style="color: var(--beds-teal-primary); font-weight: 600;">📍 ${escapeHtml(b.allocatedBay)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10.5px; color: var(--beds-text-muted);">In: ${b.gateInTimestamp.replace('T', ' ').slice(11, 16)} hrs</span>
+              <button type="button" class="btn btn-secondary btn-sm" style="font-size: 10.5px; background: var(--beds-status-success-bg); border-color: var(--beds-status-success); color: var(--beds-status-success); font-weight: 700;" onclick="markInwardStoreAccepted('${b.inwardId}')">
+                ✓ Hand Over to Store
+              </button>
+            </div>
+          `;
+          cardsContainer.appendChild(card);
+        });
+      }
+    }
+
+    // 2. Render Inward Table
+    const tbody = document.getElementById('inwardTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    filterStatus = filterStatus || (document.getElementById('filterInwStatus') ? document.getElementById('filterInwStatus').value : '');
+    searchQuery = searchQuery || '';
+
+    let list = inwardData;
+    if (filterStatus) list = list.filter(x => x.status === filterStatus);
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(x =>
+        x.inwardId.toLowerCase().includes(q) ||
+        x.poNumber.toLowerCase().includes(q) ||
+        x.vendorName.toLowerCase().includes(q) ||
+        x.vehicleNo.toLowerCase().includes(q) ||
+        x.itemSummary.toLowerCase().includes(q)
+      );
+    }
+
+    list.forEach(row => {
+      const tr = document.createElement('tr');
+      const isBay = row.status === 'IN_UNLOADING_BAY';
+      tr.innerHTML = `
+        <td><strong style="font-family: monospace;">${row.inwardId}</strong></td>
+        <td><strong>${escapeHtml(row.poNumber)}</strong><br><span style="font-size: 11px; color: var(--beds-text-secondary);">${escapeHtml(row.dcNumber)}</span></td>
+        <td>${escapeHtml(row.vendorName)}<br><span style="font-size: 11px; color: var(--beds-text-secondary);">${escapeHtml(row.transporter)}</span></td>
+        <td><strong style="font-family: monospace;">${escapeHtml(row.vehicleNo)}</strong></td>
+        <td>${escapeHtml(row.itemSummary)}<br><span style="font-size: 11px; color: var(--beds-text-muted); font-weight: 600;">Qty: ${escapeHtml(row.qty)}</span></td>
+        <td><span style="font-size: 11.5px; color: var(--beds-teal-primary); font-weight: 600;">📍 ${escapeHtml(row.allocatedBay)}</span></td>
+        <td style="font-size: 11px; color: var(--beds-text-secondary);">${row.gateInTimestamp.replace('T', ' ').slice(0, 16)}</td>
+        <td>
+          <span class="status-pill ${isBay ? 'status-warning' : 'status-success'}">
+            ${isBay ? 'In Bay' : 'Store Accepted'}
+          </span>
+        </td>
+        <td>
+          ${isBay ? `<button type="button" class="btn btn-secondary btn-sm" onclick="markInwardStoreAccepted('${row.inwardId}')">Accept Store</button>` : `<span style="font-size: 11px; color: var(--beds-text-muted);">GRN Done</span>`}
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function filterInwardTable(status) {
+    renderInwardView(status, document.querySelector('input[placeholder="Search IGE / PO / Vendor..."]')?.value || '');
+  }
+
+  function searchInwardTable(query) {
+    renderInwardView(document.getElementById('filterInwStatus')?.value || '', query);
+  }
+
+  // ─── GATE PASS CENTER (RGP / NRGP) FUNCTIONS ─────────────────────────
+  function filterGatePassView(type) {
+    currentGpFilter = type;
+    document.querySelectorAll('#btnGpAll, #btnGpRgp, #btnGpNrgp, #btnGpOverdue').forEach(b => {
+      b.classList.remove('btn-primary');
+      b.classList.add('btn-secondary');
+    });
+
+    if (type === 'ALL') document.getElementById('btnGpAll')?.classList.add('btn-primary');
+    else if (type === 'RGP') document.getElementById('btnGpRgp')?.classList.add('btn-primary');
+    else if (type === 'NRGP') document.getElementById('btnGpNrgp')?.classList.add('btn-primary');
+    else if (type === 'OVERDUE') document.getElementById('btnGpOverdue')?.classList.add('btn-primary');
+
+    renderGatePassView();
+  }
+
+  function searchGatePassTable(query) {
+    renderGatePassView(query);
+  }
+
+  function renderGatePassView(searchQuery) {
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    // Calculate KPI values
+    let activeRgp = 0;
+    let overdueRgp = 0;
+    let nrgpCount = 0;
+    let closedReturns = 0;
+
+    gatePassData.forEach(p => {
+      if (p.passType === 'RGP') {
+        if (p.gateStatus !== 'RETURNED_CLOSED') {
+          activeRgp++;
+          if (p.expectedReturnDate && p.expectedReturnDate < todayStr) {
+            overdueRgp++;
+          }
+        } else {
+          closedReturns++;
+        }
+      } else if (p.passType === 'NRGP') {
+        nrgpCount++;
+      }
+    });
+
+    if (document.getElementById('kpiRgpActive')) document.getElementById('kpiRgpActive').textContent = activeRgp;
+    if (document.getElementById('kpiRgpOverdue')) document.getElementById('kpiRgpOverdue').textContent = overdueRgp;
+    if (document.getElementById('kpiNrgpCount')) document.getElementById('kpiNrgpCount').textContent = nrgpCount;
+    if (document.getElementById('kpiReturnsClosed')) document.getElementById('kpiReturnsClosed').textContent = closedReturns;
+
+    const tbody = document.getElementById('gatePassTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    searchQuery = searchQuery || '';
+
+    let list = gatePassData;
+    if (currentGpFilter === 'RGP') list = list.filter(x => x.passType === 'RGP');
+    else if (currentGpFilter === 'NRGP') list = list.filter(x => x.passType === 'NRGP');
+    else if (currentGpFilter === 'OVERDUE') list = list.filter(x => x.passType === 'RGP' && x.gateStatus !== 'RETURNED_CLOSED' && x.expectedReturnDate && x.expectedReturnDate < todayStr);
+
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(x =>
+        x.passId.toLowerCase().includes(q) ||
+        x.itemDescription.toLowerCase().includes(q) ||
+        x.consignee.toLowerCase().includes(q) ||
+        x.vehicleNo.toLowerCase().includes(q)
+      );
+    }
+
+    list.forEach(p => {
+      const tr = document.createElement('tr');
+      const isRgp = p.passType === 'RGP';
+      const isClosed = p.gateStatus === 'RETURNED_CLOSED';
+      const isOverdue = isRgp && !isClosed && p.expectedReturnDate && p.expectedReturnDate < todayStr;
+
+      let typePill = isRgp ? '<span class="status-pill status-warning">RGP</span>' : '<span class="status-pill status-info">NRGP</span>';
+      let returnCell = isRgp ? `<strong style="font-family: monospace; ${isOverdue ? 'color: var(--beds-alert-red);' : ''}">${p.expectedReturnDate}</strong>` : `<span style="color: var(--beds-text-muted);">N/A (Scrap)</span>`;
+
+      if (isOverdue) {
+        returnCell += `<br><span class="status-pill status-critical" style="font-size: 9px; padding: 2px 4px;">🚨 OVERDUE</span>`;
+      }
+
+      let gateStatusPill = `<span class="status-pill status-info">${escapeHtml(p.gateStatus)}</span>`;
+      if (isClosed) gateStatusPill = `<span class="status-pill status-success">Returned & Closed</span>`;
+      else if (isOverdue) gateStatusPill = `<span class="status-pill status-critical">Overdue Return</span>`;
+
+      let actionBtn = '';
+      if (isRgp && !isClosed) {
+        actionBtn = `
+          <button type="button" class="btn btn-secondary btn-sm" style="font-size: 11px; font-weight: 700; background: var(--beds-status-success-bg); border-color: var(--beds-status-success); color: var(--beds-status-success);" onclick="openAcknowledgeReturnModal('${p.passId}')">
+            🔄 Return
+          </button>
+        `;
+      } else {
+        actionBtn = `
+          <button type="button" class="btn btn-secondary btn-sm" style="font-size: 11px;" onclick="printGatePassSlip('${p.passId}')">
+            🖨️ Slip
+          </button>
+        `;
+      }
+
+      tr.innerHTML = `
+        <td><strong style="font-family: monospace;">${p.passId}</strong></td>
+        <td>${typePill}</td>
+        <td><strong>${escapeHtml(p.itemDescription)}</strong><br><span style="font-size: 10.5px; color: var(--beds-text-secondary);">${escapeHtml(p.serialNo || '')}</span></td>
+        <td class="tabular-nums"><strong>${escapeHtml(p.qty)}</strong></td>
+        <td>${escapeHtml(p.consignee)}</td>
+        <td><span style="font-family: monospace; font-size: 11px;">${escapeHtml(p.vehicleNo)}</span></td>
+        <td style="font-size: 11px;">${p.dispatchDate}</td>
+        <td>${returnCell}</td>
+        <td><span class="status-pill status-success">Approved</span></td>
+        <td>${gateStatusPill}</td>
+        <td>${actionBtn}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function openCreateGatePassModal() {
+    document.getElementById('createGatePassForm').reset();
+    toggleGpTypeFields();
+    // Default expected return date to 7 days from now
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    document.getElementById('gpExpectedReturnDate').value = nextWeek.toISOString().slice(0, 10);
+    document.getElementById('modalCreateGatePass').style.display = 'flex';
+  }
+
+  function closeCreateGatePassModal() {
+    document.getElementById('modalCreateGatePass').style.display = 'none';
+  }
+
+  function toggleGpTypeFields() {
+    const isRgp = document.querySelector('input[name="gpTypeRadio"]:checked').value === 'RGP';
+    const row = document.getElementById('gpRgpSpecificRow');
+    const retField = document.getElementById('gpReturnDateField');
+    if (isRgp) {
+      if (retField) retField.style.display = 'block';
+      document.getElementById('gpExpectedReturnDate').required = true;
+    } else {
+      if (retField) retField.style.display = 'none';
+      document.getElementById('gpExpectedReturnDate').required = false;
+    }
+  }
+
+  async function handleCreateGatePassSubmit(event) {
+    if (event) event.preventDefault();
+
+    const passType = document.querySelector('input[name="gpTypeRadio"]:checked').value;
+    const item = document.getElementById('gpItemDescription').value.trim();
+    const qty = document.getElementById('gpQty').value.trim();
+    const serial = document.getElementById('gpSerialNo').value.trim();
+    const consignee = document.getElementById('gpConsignee').value.trim();
+    const veh = document.getElementById('gpVehicleNo').value.trim().toUpperCase();
+    const expDate = passType === 'RGP' ? document.getElementById('gpExpectedReturnDate').value : 'N/A';
+    const remarks = document.getElementById('gpRemarks').value.trim();
+
+    const passId = passType + '-2026-' + String(Math.floor(1000 + Math.random() * 9000));
+    const nowIso = new Date().toISOString();
+
+    const newPass = {
+      passId: passId,
+      passType: passType,
+      itemDescription: item,
+      serialNo: serial,
+      qty: qty,
+      consignee: consignee,
+      vehicleNo: veh,
+      dispatchDate: nowIso.slice(0, 10),
+      expectedReturnDate: expDate,
+      actualReturnDate: '',
+      approvalStatus: 'APPROVED',
+      approvedBy: (BalsonsAuth.currentUser ? BalsonsAuth.currentUser.fullName : 'BALSONS Project Owner'),
+      gateStatus: 'DISPATCHED_EXITED',
+      remarks: remarks
+    };
+
+    try {
+      const res = await BalsonsApi.call('transaction.gatepass.create', {
+        passType: passType,
+        itemDescription: item,
+        qty: qty,
+        consignee: consignee,
+        vehicleNo: veh,
+        expectedReturnDate: expDate,
+        remarks: remarks
+      });
+      if (res.success && res.data && res.data.passId) {
+        newPass.passId = res.data.passId;
+      }
+    } catch (err) {
+      console.warn('Gate pass local fallback:', err.message);
+    }
+
+    gatePassData.unshift(newPass);
+    closeCreateGatePassModal();
+    renderGatePassView();
+    updateRadarMetrics();
+
+    alert(`✅ ${passType} Issued Successfully!
+
+Pass ID: ${newPass.passId}
+Item: ${item} (${qty})
+Consignee: ${consignee}
+Vehicle: ${veh}
+
+Clearance logged to physical gate log and AUDIT_LOG.`);
+  }
+
+  function openAcknowledgeReturnModal(passId) {
+    const item = gatePassData.find(x => x.passId === passId);
+    if (!item) return;
+
+    document.getElementById('retPassId').value = item.passId;
+    document.getElementById('retExpectedDate').value = item.expectedReturnDate;
+    document.getElementById('retItemSummary').value = `${item.itemDescription} (${item.qty})`;
+    document.getElementById('retConsignee').value = item.consignee;
+    document.getElementById('retRemarks').value = '';
+
+    document.getElementById('modalAcknowledgeReturn').style.display = 'flex';
+  }
+
+  function closeAcknowledgeReturnModal() {
+    document.getElementById('modalAcknowledgeReturn').style.display = 'none';
+  }
+
+  async function handleAcknowledgeReturnSubmit(event) {
+    if (event) event.preventDefault();
+
+    const passId = document.getElementById('retPassId').value;
+    const condition = document.getElementById('retCondition').value;
+    const remarks = document.getElementById('retRemarks').value.trim();
+
+    const item = gatePassData.find(x => x.passId === passId);
+    if (!item) return;
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    item.actualReturnDate = todayStr;
+    item.gateStatus = 'RETURNED_CLOSED';
+    item.remarks = (item.remarks ? item.remarks + ' | ' : '') + `Return: ${condition}. ${remarks}`;
+
+    try {
+      await BalsonsApi.call('transaction.gatepass.close_return', {
+        passId: passId,
+        conditionNotes: `${condition} - ${remarks}`
+      });
+    } catch (err) {
+      console.warn('Close return local fallback:', err.message);
+    }
+
+    closeAcknowledgeReturnModal();
+    renderGatePassView();
+    updateRadarMetrics();
+
+    alert(`✅ Return Reconciled Successfully!
+
+Pass ID: ${passId}
+Item: ${item.itemDescription}
+Status: RETURNED_CLOSED
+Receiving Condition: ${condition}
+
+Inventory updated in BALSONS Store.`);
+  }
+
+  function printGatePassSlip(passId) {
+    const item = gatePassData.find(x => x.passId === passId);
+    if (!item) return;
+    alert(`🖨️ Printing JTRWF Controlled Gate Pass Slip:
+
+Pass ID: ${item.passId} (${item.passType})
+Item: ${item.itemDescription} (${item.qty})
+Consignee: ${item.consignee}
+Vehicle: ${item.vehicleNo}
+Dispatch Date: ${item.dispatchDate}
+Expected Return: ${item.expectedReturnDate}
+Approval: ${item.approvedBy}`);
+  }
+
+  function updateRadarMetrics() {
+    // Sync Command Radar metrics with real active counts
+    const activeVehicles = inwardData.filter(x => x.status === 'IN_UNLOADING_BAY').length;
+    const deliveriesToday = inwardData.length;
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const overdueCount = gatePassData.filter(x => x.passType === 'RGP' && x.gateStatus !== 'RETURNED_CLOSED' && x.expectedReturnDate && x.expectedReturnDate < todayStr).length;
+
+    const radarVehEl = document.getElementById('radarActiveVehicles');
+    if (radarVehEl) radarVehEl.textContent = activeVehicles;
+
+    const radarDelivEl = document.querySelector('.kpi-card:nth-child(3) .kpi-value');
+    if (radarDelivEl) radarDelivEl.textContent = deliveriesToday;
+
+    const radarOverdueEl = document.querySelector('.kpi-card:nth-child(4) .kpi-value');
+    if (radarOverdueEl) {
+      radarOverdueEl.textContent = overdueCount;
+      if (overdueCount > 0) {
+        radarOverdueEl.style.color = 'var(--beds-alert-red)';
+      }
+    }
   }
 
 </script>
