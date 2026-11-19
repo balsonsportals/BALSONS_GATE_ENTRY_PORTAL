@@ -781,6 +781,13 @@
           <small>Tri-portal work authorization & gate block check</small>
         </div>
       </a>
+      <a class="beds-dropdown-item" data-target="gate-dossier-360" onclick="switchTab('gate-dossier-360')">
+        <span class="item-icon">📄</span>
+        <div class="item-text">
+          <strong>360° Workforce Dossier</strong>
+          <small>Unified cross-portal master personnel record</small>
+        </div>
+      </a>
       <a class="beds-dropdown-item" data-target="personnel" onclick="switchTab('personnel')">
         <span class="item-icon">🦺</span>
         <div class="item-text">
@@ -1900,6 +1907,32 @@
       </table>
     </div>
   </section>
+
+  <!-- TAB 9: 360° WORKFORCE DOSSIER -->
+  <section id="tab-gate-dossier-360" class="section-view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; background: var(--beds-bg-panel); padding: 14px 18px; border-radius: var(--beds-radius-md); border-left: 4px solid var(--beds-teal-primary); border: 1px solid var(--beds-border);">
+      <div>
+        <h2 style="font-size: 18px; font-weight: 800; color: var(--beds-charcoal-heading); display: flex; align-items: center; gap: 8px;">
+          📄 360° Master Workforce & Site Access Dossier
+          <span class="status-pill status-info">GATE SECURITY DESK</span>
+        </h2>
+        <p style="font-size: 12px; color: var(--beds-text-secondary); margin-top: 2px;">
+          Comprehensive tri-portal profile: Employment status, statutory KYC, safety induction, Form 31, and gate pass verification.
+        </p>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <select id="gate-dossier-page-select" class="beds-select" style="font-size: 12px; padding: 6px 10px; font-weight: 700;" onchange="loadGate360DossierPage(this.value)">
+          <!-- Populated dynamically -->
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="window.print()">
+          🖨️ Print Dossier (A4)
+        </button>
+      </div>
+    </div>
+    <div id="gate-dossier-page-container">
+      <!-- Injected dynamically -->
+    </div>
+  </section>
 </main>
 
 <!-- ─── PHASE 3 MODALS: MASTER DATA REGISTRATION ───────────────────── -->
@@ -2330,6 +2363,7 @@
 <script src="assets/js/config.js"></script>
 <script src="assets/js/api-client.js"></script>
 <script src="assets/js/auth.js"></script>
+<script src="assets/js/dossier-360.js"></script>
 <script>
   function switchTab(tabName) {
     // Direct nav tabs
@@ -2363,6 +2397,19 @@
     if (tabName === 'gate-safety-clearance') {
       renderGateSafetyDirectory();
       verifyGateSecurityClearance('EMP-2026-0001');
+    } else if (tabName === 'gate-dossier-360') {
+      loadGate360DossierPage('EMP-2026-0001');
+    }
+  }
+
+  function loadGate360DossierPage(empId) {
+    const id = empId || 'EMP-2026-0001';
+    if (window.Balsons360Dossier) {
+      window.Balsons360Dossier.populateSelect('gate-dossier-page-select', id);
+      const container = document.getElementById('gate-dossier-page-container');
+      if (container) {
+        container.innerHTML = window.Balsons360Dossier.renderCard(id);
+      }
     }
   }
 
@@ -2426,10 +2473,11 @@
         <td><strong style="font-family: monospace;">${item.passNo}</strong></td>
         <td><span style="font-size: 11px;">${item.medical}</span></td>
         <td><strong style="font-family: monospace; color: #0097B2;">${item.ptw}</strong></td>
-        <td>
+        <td style="white-space: nowrap;">
           <span style="font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px; ${isGranted ? 'background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0;' : 'background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA;'}">
             ${isGranted ? '🟢 ACCESS GRANTED' : '🔴 GATE ENTRY BLOCKED'}
           </span>
+          <button class="btn btn-secondary btn-sm" onclick="Balsons360Dossier.openModal('${item.empId}')" style="font-size: 10px; padding: 2px 6px; margin-left: 6px;" title="View 360 Dossier">📄 360 Dossier</button>
         </td>
       `;
       tbody.appendChild(tr);
