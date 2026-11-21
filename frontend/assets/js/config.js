@@ -14,9 +14,6 @@ const APP_CONFIG = {
   // Master Google Spreadsheet ID
   MASTER_SPREADSHEET_ID: "1yAuZOXc8WoC2TvTvnEWMrOyLl_50BRuJgDed_pdFT3o",
 
-  // Phase 0 Shared Auth Key
-  DEV_AUTH_TOKEN: "BALSONS_JTRWF_GATE_PHASE0_DEV_KEY",
-
   // Environment: 'staging' | 'production'
-  ENVIRONMENT: "staging"
+  ENVIRONMENT: "production"
 };

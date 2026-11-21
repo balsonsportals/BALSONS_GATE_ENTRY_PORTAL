@@ -8,8 +8,7 @@ const CONFIG = {
   PROJECT_ID: 'PRJ-JTRWF-SCHULER',
   SYSTEM_NAME: 'BALSONS JTRWF Gate Entry & Site Access Portal',
   VERSION: '1.5.0-transactions',
-  ENV: 'staging',
-  AUTH_HEADER_KEY: 'BALSONS_JTRWF_GATE_PHASE0_DEV_KEY',
+  ENV: 'production',
   DEFAULT_SPREADSHEET_ID: '1yAuZOXc8WoC2TvTvnEWMrOyLl_50BRuJgDed_pdFT3o',
   
   getSpreadsheetId: function() {
@@ -65,19 +64,15 @@ function doPost(e) {
   
   var session = null;
   if (PUBLIC_ACTIONS.indexOf(action) === -1) {
-    if (authToken === CONFIG.AUTH_HEADER_KEY) {
-      session = { userId: 'DEV_CLI', username: 'dev.cli', fullName: 'Phase 0 Test Harness', role: 'Owner' };
-    } else {
-      session = AuthService.validateSession(authToken);
-      if (!session) {
-        return createJsonResponse({
-          success: false,
-          status: 401,
-          requestId: requestId,
-          action: action,
-          error: { code: 'AUTH_REQUIRED', message: 'Session expired or unauthorized. Please log in.' }
-        });
-      }
+    session = AuthService.validateSession(authToken);
+    if (!session) {
+      return createJsonResponse({
+        success: false,
+        status: 401,
+        requestId: requestId,
+        action: action,
+        error: { code: 'AUTH_REQUIRED', message: 'Session expired or unauthorized. Please log in.' }
+      });
     }
   }
 

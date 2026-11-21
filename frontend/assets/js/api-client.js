@@ -21,7 +21,7 @@ const BalsonsApi = {
     const requestPromise = (async () => {
       const startTime = performance.now();
       const requestId = 'req_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-      const authToken = customToken !== null ? customToken : APP_CONFIG.DEV_AUTH_TOKEN;
+      const authToken = customToken !== null ? customToken : (typeof BalsonsAuth !== 'undefined' && BalsonsAuth.getToken ? BalsonsAuth.getToken() : null);
 
       const requestEnvelope = {
         action: action,

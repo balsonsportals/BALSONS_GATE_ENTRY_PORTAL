@@ -665,14 +665,7 @@
       </button>
     </form>
 
-    <div class="quick-users">
-      <p>QUICK AUTOFILL FOR TESTING:</p>
-      <div class="quick-btns">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('admin', 'Balsons@2026!')">👑 Owner</button>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('safety.manager', 'Safety@2026!')">🛡️ Safety Mgr</button>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('safety.team', 'Team@2026!')">👷 Safety Team</button>
-      </div>
-    </div>
+
 
     <div style="text-align: center; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--beds-border-subtle);">
       <a href="../../index.html" style="font-size: 11px; color: var(--beds-teal-primary); text-decoration: none; font-weight: 600;">
@@ -2583,11 +2576,6 @@
     alert("🔄 Tri-Portal Sync Successful! Real-time reference data synchronized with BALSONS Safety Manager and HR Manager.");
     renderGateSafetyDirectory();
     verifyGateSecurityClearance();
-  }
-
-  function quickFill(user, pass) {
-    document.getElementById('loginUsername').value = user;
-    document.getElementById('loginPassword').value = pass;
   }
 
   async function handleLoginSubmit(e) {
