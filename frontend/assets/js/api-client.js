@@ -39,7 +39,12 @@ const BalsonsApi = {
         throw new Error(`HTTP Transport Error: ${response.status} ${response.statusText}`);
       }
 
-      const jsonResponse = await response.json();
+      let jsonResponse;
+      try {
+        jsonResponse = await response.json();
+      } catch (jsonErr) {
+        throw new Error(`Invalid JSON payload from Google Apps Script: ${jsonErr.message}`);
+      }
       jsonResponse.clientDurationMs = durationMs;
       return jsonResponse;
 
@@ -56,6 +61,15 @@ const BalsonsApi = {
         }
       };
     }
+  },
+
+  /**
+   * Universal Dispatch Call for Gate Entry frontend actions
+   * Bridges frontend views calling BalsonsApi.call(...) to send()
+   */
+  call: async function(action, payload = {}, customToken = null) {
+    const token = customToken !== null ? customToken : (typeof BalsonsAuth !== 'undefined' && BalsonsAuth.getToken ? (BalsonsAuth.getToken() || APP_CONFIG.DEV_AUTH_TOKEN) : APP_CONFIG.DEV_AUTH_TOKEN);
+    return this.send(action, payload, token);
   },
 
   /**
