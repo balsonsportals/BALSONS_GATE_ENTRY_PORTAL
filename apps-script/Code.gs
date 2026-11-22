@@ -208,6 +208,35 @@ function doPost(e) {
         responseData = AuditService.listAuditLogs(payload.limit);
         break;
 
+      // ─── GOOGLE DRIVE MASTER STORAGE (SAM-2026 TIER 4) ────────────────
+      case 'drive.get_map':
+        responseData = {
+          rootFolderId: BALSONS_DRIVE_CONFIG.ROOT_FOLDER_ID,
+          portalCode: '01_GATE_ENTRY_MANAGER',
+          folders: BALSONS_DRIVE_CONFIG.STRUCTURE['01_GATE_ENTRY_MANAGER'] || {}
+        };
+        break;
+
+      case 'drive.upload_document':
+        if (!payload.fileBase64 || !payload.fileName) {
+          throw new Error('Mandatory: fileBase64 and fileName required for Drive storage.');
+        }
+        var blob = Utilities.newBlob(
+          Utilities.base64Decode(payload.fileBase64),
+          payload.mimeType || 'application/pdf',
+          payload.fileName
+        );
+        responseData = savePortalDocument(
+          '01_GATE_ENTRY_MANAGER',
+          payload.categoryCode || '01_GATE_PASSES',
+          payload.subCategory || 'RETURNABLE_GATE_PASSES_RGP',
+          blob,
+          payload.fileName
+        );
+        AuditService.logAction(session, 'UPLOAD_DRIVE_DOCUMENT', responseData.fileId, 'SUCCESS',
+          'Saved document ' + payload.fileName + ' to Drive: ' + responseData.url);
+        break;
+
       default:
         return createJsonResponse({
           success: false,
