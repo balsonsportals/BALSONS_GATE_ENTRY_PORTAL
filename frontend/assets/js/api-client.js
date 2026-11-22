@@ -93,7 +93,9 @@ const BalsonsApi = {
    * Bridges frontend views calling BalsonsApi.call(...) to send()
    */
   call: async function(action, payload = {}, customToken = null) {
-    const token = customToken !== null ? customToken : (typeof BalsonsAuth !== 'undefined' && BalsonsAuth.getToken ? (BalsonsAuth.getToken() || APP_CONFIG.DEV_AUTH_TOKEN) : APP_CONFIG.DEV_AUTH_TOKEN);
+    // SAM-2026: DEV_AUTH_TOKEN bypass removed — production always requires a valid session token.
+    // No fallback to DEV_AUTH_TOKEN; unauthenticated calls will receive AUTH_REQUIRED from the backend.
+    const token = customToken !== null ? customToken : (typeof BalsonsAuth !== 'undefined' && BalsonsAuth.getToken ? BalsonsAuth.getToken() : null);
     return this.send(action, payload, token);
   },
 
