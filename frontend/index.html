@@ -905,7 +905,7 @@
       </form>
 
       <div class="login-footer">
-        <a href="../../index.html">← Return to Central Enterprise Workspace</a>
+        <span style="font-weight:700; color:var(--beds-charcoal-heading, #102d35);">BALSONS Heavy Lift &amp; Shift</span> · <span style="color:var(--beds-teal-primary, #0097a7);">JTRWF Site Access</span>
         <div style="margin-top:8px;">BEDS V1.0 · SAM-2026 · JTRWF Site</div>
       </div>
     </div>
@@ -915,7 +915,7 @@
 <!-- Enterprise Header -->
 <header>
   <div class="brand">
-    <a href="../../index.html" title="Return to BALSONS Enterprise Launcher" style="text-decoration: none; display: flex; align-items: center; gap: 12px;">
+    <a href="index.html" title="Return to BALSONS Enterprise Launcher" style="text-decoration: none; display: flex; align-items: center; gap: 12px;">
       <img src="assets/images/balsons-logo.png" alt="BALSONS Logo" style="height: 38px !important; max-height: 38px !important; width: auto !important; object-fit: contain !important;">
     </a>
     <div class="brand-text">
@@ -927,20 +927,7 @@
 
   <div class="header-actions">
     <!-- Portal Switcher -->
-    <div class="portal-switcher-wrap" id="portalSwitcherWrap">
-      <button class="portal-switcher-btn" onclick="document.getElementById('portalSwitcherWrap').classList.toggle('open')">
-        🚀 Portals <span style="font-size:10px;">▾</span>
-      </button>
-      <div class="portal-switcher-menu">
-        <a class="portal-switcher-item" href="../../index.html">🏢 Enterprise Launcher</a>
-        <a class="portal-switcher-item current" href="index.html">🚧 Gate Entry Manager</a>
-        <a class="portal-switcher-item" href="../../BALSONS HR MANAGER/frontend/index.html">👷 HR &amp; Payroll Manager</a>
-        <a class="portal-switcher-item" href="../../BALSONS OPERATIONS MANAGER/index.html">🏗️ Operations Manager</a>
-        <a class="portal-switcher-item" href="../../BALSONS PURCHASE MANAGER/index.html">🛒 Purchase Manager</a>
-        <a class="portal-switcher-item" href="../../BALSONS SAFETY MANAGER/frontend/index.html">🦺 Safety Manager</a>
-        <a class="portal-switcher-item" href="../../BALSONS STORE MANAGER/frontend/index.html">📦 Store Manager</a>
-      </div>
-    </div>
+    
     <span class="meta-badge">PRJ-JTRWF-SCHULER</span>
     <a href="https://drive.google.com/drive/folders/1BbLIA4W-JSk2HFTKsNN1XI5Vr9WQ1bi-" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="background: rgba(0, 151, 178, 0.08); border-color: var(--beds-teal-primary); color: var(--beds-teal-primary); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Open Gate Entry Master Document Vault on Google Drive">
       📁 Drive Vault ↗
@@ -962,8 +949,7 @@
       <div class="user-pill-menu">
         <div class="user-pill-menu-item">👤 <span id="menuUserFullName">User</span></div>
         <div class="user-pill-menu-divider"></div>
-        <a class="user-pill-menu-item" href="../../index.html">🏢 Switch Portal</a>
-        <div class="user-pill-menu-divider"></div>
+        
         <div class="user-pill-menu-item danger" onclick="BalsonsAuth.logout()">🔓 Log Out</div>
       </div>
     </div>
