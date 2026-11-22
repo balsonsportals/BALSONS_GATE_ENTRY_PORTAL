@@ -4914,12 +4914,8 @@ Approval: ${item.approvedBy}`);
     URL.revokeObjectURL(url);
   }
 
-  // Close all header dropdowns on outside click
+  // Close header user dropdown on outside click
   document.addEventListener('click', function(e) {
-    if (!e.target.closest('#portalSwitcherWrap')) {
-      var w = document.getElementById('portalSwitcherWrap');
-      if (w) w.classList.remove('open');
-    }
     if (!e.target.closest('#userPillWrap')) {
       var u = document.getElementById('userPillWrap');
       if (u) u.classList.remove('open');
